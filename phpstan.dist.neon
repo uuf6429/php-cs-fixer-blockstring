@@ -1,0 +1,12 @@
+includes:
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+parameters:
+	level: 10
+	paths:
+		- src
+		- tests
+	excludePaths:
+		- tests/fixtures/*
+	ignoreErrors:
+		- '#Dynamic call to static method PHPUnit\\Framework\\.*#'

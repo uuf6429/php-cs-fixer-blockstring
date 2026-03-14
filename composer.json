@@ -1,0 +1,54 @@
+{
+    "name": "uuf6429/php-cs-fixer-blockstring",
+    "description": "A PHP-CS-Fixer extension for formatting the contents of PHP heredoc and nowdoc string blocks.",
+    "keywords": [
+        "php",
+        "php-cs-fixer",
+        "php-cs-fixer-extension",
+        "static-analysis",
+        "code-formatting",
+        "code-style",
+        "block-string",
+        "heredoc",
+        "nowdoc"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Sciberras",
+            "email": "christian@sciberras.me"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "symfony/process": "*",
+        "friendsofphp/php-cs-fixer": "^3"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.7",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "uuf6429\\PhpCsFixerBlockstring\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "uuf6429\\PhpCsFixerBlockstringTests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit -dzend_extension=php_xdebug -dxdebug.mode=coverage --colors=always",
+        "lint": "phpstan analyse --verbose --no-progress --ansi",
+        "readme": "php tools/readmerator/generate.php README.md"
+    },
+    "config": {
+        "process-timeout": 0
+    }
+}
