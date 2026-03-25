@@ -17,8 +17,6 @@ use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter;
 use const T_START_HEREDOC;
 
 /**
- * @internal
- *
  * @phpstan-type TFormatterConfig array{formatters: array<0|non-empty-string, AbstractFormatter>}
  *
  * @implements ConfigurableFixerInterface<TFormatterConfig, TFormatterConfig>
