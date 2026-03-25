@@ -64,10 +64,10 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 	 * @param 'never'|'missing'|'always' $pullMode
 	 */
 	public function __construct(
-		string $image,
-		array $options = [],
-		array $command = [],
-		string $pullMode = 'never',
+		string          $image,
+		array           $options = [],
+		array           $command = [],
+		string          $pullMode = 'never',
 		?CodecInterface $interpolationCodec = null
 	) {
 		$this->image = $image;
@@ -165,8 +165,6 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 			null
 		);
 
-		return $process
-			->mustRun()
-			->getOutput();
+		return substr($process->mustRun()->getOutput(), 0, -1);
 	}
 }

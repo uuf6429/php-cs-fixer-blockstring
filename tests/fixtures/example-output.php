@@ -21,7 +21,6 @@ $json = <<<"JSON"
 	  "ascending": false,
 	  "users": {$jsonUsers}
 	}
-	
 	JSON;
 
 echo <<<JS

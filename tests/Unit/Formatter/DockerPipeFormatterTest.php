@@ -43,7 +43,6 @@ final class DockerPipeFormatterTest extends TestCase
 			    "mars"
 			  ]
 			}
-			
 			JSON,
 			implode('', $outputBlockString->segments)
 		);
