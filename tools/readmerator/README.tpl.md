@@ -34,11 +34,11 @@ use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])  // 👈 1️⃣
-    ->setRules(
+    ->setRules([
         'Uuf6429/block_string' => [
             'formatters' => [],                       // 👈 2️⃣
         ]
-    )
+    ])
     ->setFinder(...);
 ```
 
