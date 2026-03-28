@@ -92,7 +92,7 @@ jobs:
                 uses: douglascamata/setup-docker-macos-action@v1.1.0
             -   run: composer update --ansi --no-progress
             -   run: composer test -- --coverage-clover=coverage.xml --log-junit junit.xml --testdox
-            -   uses: codecov/codecov-action@v5
+            -   uses: codecov/codecov-action@v6
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     files: coverage.xml
