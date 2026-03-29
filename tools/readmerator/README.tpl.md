@@ -182,3 +182,5 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
 
 [`InterpolationCodec`]: ./src/InterpolationCodec
+
+[`CliPipeFormatter`]: ./src/Formatter/CliPipeFormatter.php

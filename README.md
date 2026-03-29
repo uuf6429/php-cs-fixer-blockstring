@@ -426,6 +426,11 @@ Example:
 ) ]]
 ```
 
+### [WslPipeFormatter](./src/Formatter/WslPipeFormatter.php)
+
+A formatter making use of Windows Subsystem for Linux (WSL). Of course you will need to be running on Windows and WSL
+needs to be enabled and set up. Configuration is otherwise almost identical to [`CliPipeFormatter`].
+
 [PHP-CS-Fixer]: https://github.com/PHP-CS-Fixer/PHP-CS-Fixer
 
 [Heredoc]: https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
@@ -441,3 +446,5 @@ Example:
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
 
 [`InterpolationCodec`]: ./src/InterpolationCodec
+
+[`CliPipeFormatter`]: ./src/Formatter/CliPipeFormatter.php

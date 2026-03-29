@@ -51,7 +51,7 @@ class CliPipeFormatter extends AbstractCodecFormatter
 		$versionValueOrCommand,
 		array $formatCommand,
 		?CodecInterface $interpolationCodec = null,
-		bool $stripLastNewLine = true
+		bool $stripLastNewLine = false
 	) {
 		$this->formatter = $formatCommand;
 		$this->stripLastNewLine = $stripLastNewLine;
@@ -67,7 +67,7 @@ class CliPipeFormatter extends AbstractCodecFormatter
 	/**
 	 * @param TCommand $spec
 	 */
-	private function exec(array $spec, ?string $input): string
+	protected function exec(array $spec, ?string $input): string
 	{
 		$process = is_array($spec['cmd'])
 			? new Process(
@@ -91,6 +91,7 @@ class CliPipeFormatter extends AbstractCodecFormatter
 	protected function formatContent(string $original): string
 	{
 		$output = $this->exec($this->formatter, $original);
+
 		return ($this->stripLastNewLine && substr($output, -1) === "\n")
 			? substr($output, 0, -1)
 			: $output;

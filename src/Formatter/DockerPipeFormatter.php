@@ -173,6 +173,7 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 		);
 
 		$output = $process->mustRun()->getOutput();
+
 		return ($this->stripLastNewLine && substr($output, -1) === "\n")
 			? substr($output, 0, -1)
 			: $output;
