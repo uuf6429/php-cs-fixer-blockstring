@@ -35,7 +35,7 @@ jobs:
             -   run: composer validate --strict --no-check-lock
 
     check_code:
-        name: Analyse code
+        name: Check code
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v6
@@ -59,15 +59,15 @@ jobs:
             -   run: diff -u README.md .generated-readme.md
 
     tests:
-        name: Build & Test (${{ matrix.osName }}, PHP ${{ matrix.php }})
+        name: Build & Test (PHP ${{ matrix.php }} ${{ matrix.desc }})
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
+                desc:
+                    - 'on Ubuntu'
                 os:
                     - 'ubuntu-latest'
-                osName:
-                    - 'Ubuntu'
                 php:
                     - '7.4'
                     - '8.0'
@@ -77,14 +77,14 @@ jobs:
                     - '8.4'
                     - '8.5'
                 include:
-                    -   os: 'macos-15-intel'
-                        osName: 'macOS'
+                    -   desc: 'on macOS'
+                        os: 'macos-15-intel'
                         php: '8.4'
-                    -   os: 'windows-latest'
-                        osName: 'Windows'
+                    -   desc: 'on Windows'
+                        os: 'windows-latest'
                         php: '8.4'
-                    -   os: 'ubuntu-latest'
-                        osName: 'Ubuntu'
+                    -   desc: '+ bootstrap, on Ubuntu'
+                        os: 'ubuntu-latest'
                         php: '8.4'
                         bootstrap: true
         steps:
@@ -94,6 +94,12 @@ jobs:
                     php-version: "${{ matrix.php }}"
                     ini-file: "development"
                     coverage: "xdebug"
+            -   id: composer-cache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+            -   uses: actions/cache@v3
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
             -   if: matrix.os == 'macos-15-intel'
                 uses: douglascamata/setup-docker-macos-action@v1.1.0
             -   if: ${{ matrix.bootstrap }}
@@ -103,11 +109,17 @@ jobs:
                     jq -r --indent 4 '.autoload += {"files": ["bootstrap.php"]}' composer.tmp > composer.json
             -   run: composer update --ansi --no-progress
             -   run: composer test -- --coverage-clover=coverage.xml --log-junit junit.xml --testdox
-            -   uses: codecov/codecov-action@v5
+            -   if: ${{ !cancelled() }}
+                uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
-                    files: coverage.xml
-                    flags: php${{ matrix.php }}
-            -   uses: codecov/test-results-action@v1
+                    report_type: coverage
+                    name: "Coverage: PHP ${{ matrix.php }} ${{ matrix.desc }}"
+                    flags: ${{ runner.os }}-php-${{ matrix.php }}
+            -   if: ${{ !cancelled() }}
+                uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
+                    report_type: test_results
+                    name: "Tests: PHP ${{ matrix.php }} ${{ matrix.desc }}"
+                    flags: ${{ runner.os }}-php-${{ matrix.php }}
