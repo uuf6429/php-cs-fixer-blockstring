@@ -6,11 +6,12 @@ use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 
 /**
- * This the base class of all formatters. In most cases you don't really want to extend this class, since it does not
- * handle string interpolation at all - check out {@see AbstractCodecFormatter} instead.
+ * This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
+ * not handle string interpolation at all - check out {@see AbstractCodecFormatter} instead.
  *
  * Extending this class makes sense in two situations:
- * 1. If your class is infrastructural and you don't really need to handle string interpolation - just like
+ *
+ * 1. If your class is infrastructural, and you don't really need to handle string interpolation - just like
  *    {@see ChainFormatter}
  * 2. Or if, for whatever reason, the {@see CodecInterface} concept does not work for you and you want to write
  *    something from scratch.
