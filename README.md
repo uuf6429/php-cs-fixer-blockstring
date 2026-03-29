@@ -42,6 +42,13 @@ return (new PhpCsFixer\Config())
     ->setFinder(...);
 ```
 
+> [!WARNING]
+> If PHP CS Fixer is installed via [`php-cs-fixer/shim`](https://github.com/PHP-CS-Fixer/shim) package, you may have to
+> require the bootstrap file:
+> ```php
+> require __DIR__ . '/vendor/uuf6429/php-cs-fixer-blockstring/bootstrap.php';
+> ```
+
 ## 💡 Before You Start
 
 <details>
