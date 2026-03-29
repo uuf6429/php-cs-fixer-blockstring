@@ -111,14 +111,14 @@ jobs:
             -   run: composer update --ansi --no-progress
             -   run: composer test -- --coverage-clover=coverage.xml --log-junit junit.xml --testdox
             -   if: ${{ !cancelled() }}
-                uses: codecov/codecov-action@v5
+                uses: codecov/codecov-action@v6
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     report_type: coverage
                     name: "Coverage: PHP ${{ matrix.php }} ${{ matrix.desc }}"
                     flags: ${{ runner.os }}-php-${{ matrix.php }}
             -   if: ${{ !cancelled() }}
-                uses: codecov/codecov-action@v5
+                uses: codecov/codecov-action@v6
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     report_type: test_results
