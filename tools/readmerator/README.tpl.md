@@ -35,7 +35,7 @@ use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])  // 👈 1️⃣
     ->setRules([
-        'Uuf6429/block_string' => [
+        BlockStringFixer::NAME => [
             'formatters' => [],                       // 👈 2️⃣
         ]
     ])
@@ -53,7 +53,7 @@ configured to run for any Block Strings that have other not been configured.
 For example:
 
 ```php
-	'Uuf6429/block_string' => [
+	BlockStringFixer::NAME => [
 		'formatters' => [
 			new LineFormatter(),
 			'JSON' => new JsonFormatter(),

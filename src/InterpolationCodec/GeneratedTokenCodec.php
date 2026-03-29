@@ -72,7 +72,7 @@ final class GeneratedTokenCodec implements CodecInterface
 			$matchPos = 0;
 			$matchToken = null;
 
-			while ($curPos < $len && ($node = $node->children[$content[$curPos] ?? null] ?? null) !== null) {
+			while ($curPos < $len && ($node = $node->children[$content[$curPos] ?? ''] ?? null) !== null) {
 				$curPos++;
 				if ($node->token !== null) {
 					$matchToken = $node->token;

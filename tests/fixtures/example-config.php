@@ -8,7 +8,7 @@ return (new PhpCsFixer\Config())
 	->registerCustomFixers([new BlockStringFixer()])
 	->setRiskyAllowed(true)
 	->setRules([
-		'Uuf6429/block_string' => [
+		BlockStringFixer::NAME => [
 			'formatters' => [
 
 				// 1️⃣ SimpleLineFormatter
