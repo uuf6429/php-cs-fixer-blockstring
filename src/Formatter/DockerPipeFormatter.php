@@ -21,6 +21,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  *     command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
  *     pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+ *     stripLastNewLine: true,                     // Remove last line from docker output - typically needed.
  * ) ]]
  * ```
  *
@@ -58,7 +59,11 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 	private array $imageDetails;
 
 	/**
-	 * @param string $image
+	 * @readonly
+	 */
+	private bool $stripLastNewLine;
+
+	/**
 	 * @param list<string> $options
 	 * @param list<string> $command
 	 * @param 'never'|'missing'|'always' $pullMode
@@ -68,13 +73,15 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 		array           $options = [],
 		array           $command = [],
 		string          $pullMode = 'never',
-		?CodecInterface $interpolationCodec = null
+		?CodecInterface $interpolationCodec = null,
+		bool            $stripLastNewLine = true
 	) {
 		$this->image = $image;
 		$this->options = $options;
 		$this->command = $command;
 		$this->pullMode = $pullMode;
 		$this->imageDetails = $this->resolveImageDetails();
+		$this->stripLastNewLine = $stripLastNewLine;
 
 		parent::__construct(
 			"{$this->imageDetails['platform']};{$this->imageDetails['digest']}",
@@ -165,6 +172,9 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 			null
 		);
 
-		return substr($process->mustRun()->getOutput(), 0, -1);
+		$output = $process->mustRun()->getOutput();
+		return ($this->stripLastNewLine && substr($output, -1) === "\n")
+			? substr($output, 0, -1)
+			: $output;
 	}
 }

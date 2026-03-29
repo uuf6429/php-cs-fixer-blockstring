@@ -384,6 +384,7 @@ Example:
     versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
     formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+    stripLastNewLine: true,                     // Remove last line from cli output - you might need this, depending on the platform/shell.
 ) ]]
 ```
 
@@ -407,6 +408,7 @@ Example:
     command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
     pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+    stripLastNewLine: true,                     // Remove last line from docker output - typically needed.
 ) ]]
 ```
 

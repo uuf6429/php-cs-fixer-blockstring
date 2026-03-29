@@ -16,6 +16,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  *     versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
  *     formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+ *     stripLastNewLine: true,                     // Remove last line from cli output - you might need this, depending on the platform/shell.
  * ) ]]
  * ```
  *
@@ -37,6 +38,11 @@ class CliPipeFormatter extends AbstractCodecFormatter
 	private array $formatter;
 
 	/**
+	 * @readonly
+	 */
+	private bool $stripLastNewLine;
+
+	/**
 	 * @param TVersion|TCommand $versionValueOrCommand Either the version (as a string) or a command to retrieve the
 	 * version (as an array).
 	 * @param TCommand $formatCommand A command, as an array, to perform the formatting.
@@ -44,9 +50,11 @@ class CliPipeFormatter extends AbstractCodecFormatter
 	public function __construct(
 		$versionValueOrCommand,
 		array $formatCommand,
-		?CodecInterface $interpolationCodec = null
+		?CodecInterface $interpolationCodec = null,
+		bool $stripLastNewLine = true
 	) {
 		$this->formatter = $formatCommand;
+		$this->stripLastNewLine = $stripLastNewLine;
 
 		parent::__construct(
 			is_string($versionValueOrCommand)
@@ -58,7 +66,6 @@ class CliPipeFormatter extends AbstractCodecFormatter
 
 	/**
 	 * @param TCommand $spec
-	 * @return string
 	 */
 	private function exec(array $spec, ?string $input): string
 	{
@@ -83,6 +90,9 @@ class CliPipeFormatter extends AbstractCodecFormatter
 
 	protected function formatContent(string $original): string
 	{
-		return $this->exec($this->formatter, $original);
+		$output = $this->exec($this->formatter, $original);
+		return ($this->stripLastNewLine && substr($output, -1) === "\n")
+			? substr($output, 0, -1)
+			: $output;
 	}
 }
