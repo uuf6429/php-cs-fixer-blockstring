@@ -96,7 +96,7 @@ jobs:
                     coverage: "xdebug"
             -   id: composer-cache
                 shell: bash
-                run: echo "dir=$(composer config cache-dir)" >> $GITHUB_OUTPUT
+                run: echo "dir=$(composer config cache-dir)" >> "$GITHUB_OUTPUT"
             -   uses: actions/cache@v4
                 with:
                     path: ${{ steps.composer-cache.outputs.dir }}
