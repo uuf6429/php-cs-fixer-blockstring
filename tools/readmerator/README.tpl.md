@@ -173,3 +173,5 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 [`AbstractCodecFormatter`]: ./src/Formatter/AbstractCodecFormatter.php
 
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
+
+[`InterpolationCodec`]: ./src/InterpolationCodec

@@ -21,7 +21,7 @@ file_put_contents(
 				['·', '---→'],
 				file_get_contents("$projectRoot/tests/fixtures/example-output.php")
 			),
-			'{{FORMATTERS}}' => implode(
+			'{{FORMATTERS}}' => rtrim(implode(
 				"\n",
 				array_map(
 					static fn(string $classFile): string => sprintf(
@@ -38,7 +38,7 @@ file_put_contents(
 					),
 					glob("$projectRoot/src/Formatter/*.php"),
 				)
-			),
+			), "\n"),
 		]
 	)
 );

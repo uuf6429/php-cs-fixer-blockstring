@@ -341,11 +341,12 @@ Example with an anonymous class:
 
 ### [AbstractFormatter](./src/Formatter/AbstractFormatter.php)
 
-This the base class of all formatters. In most cases you don't really want to extend this class, since it does not
-handle string interpolation at all - check out [`AbstractCodecFormatter`] instead.
+This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
+not handle string interpolation at all - check out [`AbstractCodecFormatter`] instead.
 
 Extending this class makes sense in two situations:
-1. If your class is infrastructural and you don't really need to handle string interpolation - just like
+
+1. If your class is infrastructural, and you don't really need to handle string interpolation - just like
    [`ChainFormatter`]
 2. Or if, for whatever reason, the [`CodecInterface`] concept does not work for you and you want to write
    something from scratch.
@@ -380,6 +381,7 @@ Example:
 ```
 
 The command definition (for version detection or formatting) is an array with the following structure:
+
 - `cmd` - array/string - The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
 - `cwd` - (optional) string - The current working directory of the command.
 - `env` - (optional) array of string keys and values - Environment variables to pass to the command.
@@ -415,7 +417,6 @@ Example:
 ) ]]
 ```
 
-
 [PHP-CS-Fixer]: https://github.com/PHP-CS-Fixer/PHP-CS-Fixer
 
 [Heredoc]: https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
@@ -429,3 +430,5 @@ Example:
 [`AbstractCodecFormatter`]: ./src/Formatter/AbstractCodecFormatter.php
 
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
+
+[`InterpolationCodec`]: ./src/InterpolationCodec

@@ -20,6 +20,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  * ```
  *
  * The command definition (for version detection or formatting) is an array with the following structure:
+ *
  * - `cmd` - array/string - The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
  * - `cwd` - (optional) string - The current working directory of the command.
  * - `env` - (optional) array of string keys and values - Environment variables to pass to the command.
