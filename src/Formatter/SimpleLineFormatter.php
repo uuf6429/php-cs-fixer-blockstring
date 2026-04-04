@@ -16,7 +16,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *     indentSize: 4,                              // The number of spaces defining one indentation level in your project.
  *     indentChar: "\t",                           // The actual character used for indentation (space or tab).
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     lineEndingNormalizer: null,                // A normalizer for handling end-of-line characters.
+ *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
  * ) ]]
  * ```
  */

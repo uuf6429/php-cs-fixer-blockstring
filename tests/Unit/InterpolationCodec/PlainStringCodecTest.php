@@ -3,6 +3,7 @@
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\InterpolationCodec;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\PlainStringCodec;
@@ -17,7 +18,7 @@ final class PlainStringCodecTest extends TestCase
 		$codec = new PlainStringCodec();
 
 		$this->expectExceptionObject(
-			new \RuntimeException(
+			new RuntimeException(
 				'PlainStringCodec does not support string interpolation by default'
 			)
 		);
@@ -30,7 +31,7 @@ final class PlainStringCodecTest extends TestCase
 		$codec = new PlainStringCodec();
 
 		$this->expectExceptionObject(
-			new \RuntimeException(
+			new RuntimeException(
 				'PlainStringCodec does not support string interpolation by default'
 			)
 		);

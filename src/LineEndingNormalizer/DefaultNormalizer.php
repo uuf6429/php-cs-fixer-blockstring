@@ -2,6 +2,10 @@
 
 namespace uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer;
 
+/**
+ * @phpstan-type TChangeLinesTo self::NO_CHANGE|self::LF|self::CRLF|self::AUTO
+ * @phpstan-type TChangeFinalLineTo self::NO_CHANGE|self::STRIP|self::ENSURE
+ */
 class DefaultNormalizer implements NormalizerInterface
 {
 	public const NO_CHANGE = 'noop';
@@ -12,18 +16,18 @@ class DefaultNormalizer implements NormalizerInterface
 	public const AUTO = 'auto';
 
 	/**
-	 * @var self::NO_CHANGE|self::LF|self::CRLF|self::AUTO
+	 * @var TChangeLinesTo
 	 */
 	private string $changeLinesTo;
 
 	/**
-	 * @var self::NO_CHANGE|self::ENSURE|self::STRIP
+	 * @var TChangeFinalLineTo
 	 */
 	private string $changeFinalLineTo;
 
 	/**
-	 * @param self::NO_CHANGE|self::LF|self::CRLF|self::AUTO $changeLinesTo
-	 * @param self::NO_CHANGE|self::ENSURE|self::STRIP $changeFinalLineTo
+	 * @param TChangeLinesTo $changeLinesTo
+	 * @param TChangeFinalLineTo $changeFinalLineTo
 	 */
 	public function __construct(string $changeLinesTo, string $changeFinalLineTo)
 	{
@@ -49,7 +53,7 @@ class DefaultNormalizer implements NormalizerInterface
 				return $this->setLineEnding($text, "\r\n");
 
 			case self::AUTO:
-				return $this->setLineEnding($text, $this->detectOriginalEol($original));
+				return $this->setLineEnding($text, $this->detectLineEnding($original));
 
 			case self::NO_CHANGE:
 			default:
@@ -63,22 +67,18 @@ class DefaultNormalizer implements NormalizerInterface
 			return $text;
 		}
 
-		return strtr($text, ["\r\n" => "\n", "\r" => "\n", "\n" => $eol]);
+		return str_replace(["\r\n", "\r", "\n"], ["\n", "\n", $eol], $text);
 	}
 
-	private function detectOriginalEol(string $text): string
+	private function detectLineEnding(string $text): string
 	{
-		$lfCount = substr_count($text, "\n");
-		$crlfCount = substr_count($text, "\r\n");
-		$crCount = substr_count($text, "\r");
-
-		if ($crlfCount > $lfCount && $crlfCount > $crCount) {
+		if (substr_count($text, "\r\n") > 0) {
 			return "\r\n"; // Windows-style
 		}
-		if ($lfCount > $crCount) {
+		if (substr_count($text, "\n") > 0) {
 			return "\n"; // Unix-style
 		}
-		if ($crCount > 0) {
+		if (substr_count($text, "\r") > 0) {
 			return "\r"; // Mac-style
 		}
 		return '';
@@ -128,7 +128,7 @@ class DefaultNormalizer implements NormalizerInterface
 				return "$text\r\n";
 
 			case self::AUTO:
-				return "$text{$this->detectOriginalEol($original)}";
+				return "$text{$this->detectLineEnding($original)}";
 
 			case self::NO_CHANGE:
 			default:
