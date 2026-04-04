@@ -2,6 +2,7 @@
 
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\InterpolationCodec;
 
+use LogicException;
 use PhpCsFixer\Tokenizer\Token;
 use PHPUnit\Framework\TestCase;
 use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
@@ -19,7 +20,7 @@ final class GeneratedTokenCodecTest extends TestCase
 		$codec = new GeneratedTokenCodec('');
 
 		$this->expectExceptionObject(
-			new \LogicException(
+			new LogicException(
 				'Replacement token cannot be an empty string!'
 			)
 		);
@@ -34,7 +35,7 @@ final class GeneratedTokenCodecTest extends TestCase
 		});
 
 		$this->expectExceptionObject(
-			new \LogicException(
+			new LogicException(
 				'Replacement token cannot be an empty string!'
 			)
 		);

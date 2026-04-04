@@ -4,6 +4,8 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
 use Symfony\Component\Process\Process;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
  * It's no secret that the best formatting tools are not directly available in PHP. This formatter off-loads formatting
@@ -16,7 +18,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  *     versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
  *     formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     stripLastNewLine: true,                     // Remove last line from cli output - you might need this, depending on the platform/shell.
+ *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
  * ) ]]
  * ```
  *
@@ -38,29 +40,38 @@ class CliPipeFormatter extends AbstractCodecFormatter
 	private array $formatter;
 
 	/**
-	 * @readonly
-	 */
-	private bool $stripLastNewLine;
-
-	/**
 	 * @param TVersion|TCommand $versionValueOrCommand Either the version (as a string) or a command to retrieve the
 	 * version (as an array).
 	 * @param TCommand $formatCommand A command, as an array, to perform the formatting.
+	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
 		$versionValueOrCommand,
 		array $formatCommand,
 		?CodecInterface $interpolationCodec = null,
-		bool $stripLastNewLine = false
+		$lineEndingNormalizer = false
 	) {
 		$this->formatter = $formatCommand;
-		$this->stripLastNewLine = $stripLastNewLine;
+
+		if (is_bool($lineEndingNormalizer)) {
+			trigger_deprecation(
+				'uuf6429/php-cs-fixer-blockstring',
+				'1.0.4',
+				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
+				__METHOD__
+			);
+			$lineEndingNormalizer = new DefaultNormalizer(
+				DefaultNormalizer::LF,
+				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
+			);
+		}
 
 		parent::__construct(
 			is_string($versionValueOrCommand)
 				? $versionValueOrCommand
 				: $this->exec($versionValueOrCommand, null),
-			$interpolationCodec
+			$interpolationCodec,
+			$lineEndingNormalizer
 		);
 	}
 
@@ -90,10 +101,6 @@ class CliPipeFormatter extends AbstractCodecFormatter
 
 	protected function formatContent(string $original): string
 	{
-		$output = $this->exec($this->formatter, $original);
-
-		return ($this->stripLastNewLine && substr($output, -1) === "\n")
-			? substr($output, 0, -1)
-			: $output;
+		return $this->exec($this->formatter, $original);
 	}
 }

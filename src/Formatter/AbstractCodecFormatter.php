@@ -5,6 +5,8 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\PlainStringCodec;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
  * This formatter base class is aware of string interpolation - it passes content through a codec before and after
@@ -25,14 +27,14 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\PlainStringCodec;
  *     }
  * }
  *
- * ['formatters' => [ new MyFormatter('1.0', new PlainStringCodec()) ]]
+ * ['formatters' => [ new MyFormatter('1.0') ]]
  * ```
  *
  * Example with an anonymous class:
  *
  * ```php
  * ['formatters' => [
- *     new class ('1.0', new PlainStringCodec()) extends AbstractCodecFormatter
+ *     new class ('1.0') extends AbstractCodecFormatter
  *     {
  *         protected function formatContent(string $original): string
  *         {
@@ -58,12 +60,21 @@ abstract class AbstractCodecFormatter extends AbstractFormatter
 	 */
 	protected CodecInterface $interpolationCodec;
 
-	public function __construct(string $version, ?CodecInterface $interpolationCodec)
-	{
+	/**
+	 * @readonly
+	 */
+	private NormalizerInterface $lineEndingNormalizer;
+
+	public function __construct(
+		string               $version,
+		?CodecInterface      $interpolationCodec=null,
+		?NormalizerInterface $lineEndingNormalizer=null
+	) {
 		parent::__construct($version);
 
 		$this->objectIndex = self::$objectCounter++;
 		$this->interpolationCodec = $interpolationCodec ?? new PlainStringCodec();
+		$this->lineEndingNormalizer = $lineEndingNormalizer ?? new DefaultNormalizer(DefaultNormalizer::NO_CHANGE, DefaultNormalizer::NO_CHANGE);
 	}
 
 	final public function formatBlock(BlockString $blockString): BlockString
@@ -72,8 +83,10 @@ abstract class AbstractCodecFormatter extends AbstractFormatter
 
 		$cacheKey = $this->objectIndex . ':' . md5($codecResult->content);
 		if (!isset(self::$cache[$cacheKey])) {
-			self::$cache[$cacheKey] = $this->formatContent(
-				$this->removeIndentation($codecResult->content, $blockString->indentation)
+			$content = $this->removeIndentation($codecResult->content, $blockString->indentation);
+			self::$cache[$cacheKey] = $this->lineEndingNormalizer->normalize(
+				$this->formatContent($content),
+				$content
 			);
 		}
 		$newContent = $this->applyIndentation(self::$cache[$cacheKey], $blockString->indentation);
@@ -90,11 +103,11 @@ abstract class AbstractCodecFormatter extends AbstractFormatter
 
 	private function removeIndentation(string $lines, string $indentation): string
 	{
-		return substr(str_replace("\n{$indentation}", "\n", $lines), strlen($indentation));
+		return substr(str_replace("\n{$indentation}", "\n", $lines), strlen($indentation)); // TODO feels wrong (eol)
 	}
 
 	private function applyIndentation(string $lines, string $indentation): string
 	{
-		return $indentation . str_replace("\n", "\n{$indentation}", $lines);
+		return $indentation . str_replace("\n", "\n{$indentation}", $lines); // TODO feels wrong (eol)
 	}
 }

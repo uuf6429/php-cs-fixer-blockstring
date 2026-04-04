@@ -3,6 +3,8 @@
 namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
  * A formatter that normalizes indentation and removes any trailing whitespace at the end of lines.
@@ -14,6 +16,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  *     indentSize: 4,                              // The number of spaces defining one indentation level in your project.
  *     indentChar: "\t",                           // The actual character used for indentation (space or tab).
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+ *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
  * ) ]]
  * ```
  */
@@ -34,16 +37,31 @@ class SimpleLineFormatter extends AbstractCodecFormatter
 	/**
 	 * @param positive-int $indentSize
 	 * @param "\t"|' ' $indentChar
+	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
 		int             $indentSize = 4,
 		string          $indentChar = "\t",
-		?CodecInterface $interpolationCodec = null
+		?CodecInterface $interpolationCodec = null,
+		                $lineEndingNormalizer = false
 	) {
-		parent::__construct('1', $interpolationCodec);
-
 		$this->indentSize = $indentSize;
 		$this->indentChar = $indentChar;
+
+		if (is_bool($lineEndingNormalizer)) {
+			trigger_deprecation(
+				'uuf6429/php-cs-fixer-blockstring',
+				'1.0.4',
+				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
+				__METHOD__
+			);
+			$lineEndingNormalizer = new DefaultNormalizer(
+				DefaultNormalizer::LF,
+				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
+			);
+		}
+
+		parent::__construct('1', $interpolationCodec, $lineEndingNormalizer);
 	}
 
 	protected function formatContent(string $original): string

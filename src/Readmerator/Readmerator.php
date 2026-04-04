@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace uuf6429\PhpCsFixerBlockstring\Readmerator;
 
@@ -7,44 +7,27 @@ use RuntimeException;
 /**
  * @internal
  */
-class Readmerator
+final class Readmerator
 {
 	private const PROJECT_ROOT = __DIR__ . '/../../';
-	private const README_TARGET = self::PROJECT_ROOT . 'README.md';
 	private const README_TEMPLATE = __DIR__ . '/README.tpl.md';
 
-	public static function rewrite(): void
-	{
-		file_put_contents(self::README_TARGET, (new self)->generate());
-		echo "README.md generated\n";
-	}
-
-	public static function verify(): void
-	{
-		$expected = self::readFile(self::README_TARGET);
-		$actual = (new self)->generate();
-
-		if ($expected !== $actual) {
-			throw new RuntimeException("README.md is not up-to-date:\n\n" . self::diff($expected, $actual));
-		}
-	}
-
-	public function generate(): string
+	public static function render(): void
 	{
 		$projectRoot = self::normalizePath(self::PROJECT_ROOT);
-		return strtr(
+		echo strtr(
 			self::readFile(self::README_TEMPLATE),
 			[
 				'{{PROJECT_NAME}}' => 'uuf6429/php-cs-fixer-blockstring',
 				'{{EXAMPLE_CONFIG}}' => file_get_contents("$projectRoot/tests/fixtures/example-config.php"),
 				'{{EXAMPLE_INPUT}}' => str_replace(
 					[' ', "\t"],
-					['·', '---→'],
+					['·', '───→'],
 					self::readFile("$projectRoot/tests/fixtures/example-input.php"),
 				),
 				'{{EXAMPLE_OUTPUT}}' => str_replace(
 					[' ', "\t"],
-					['·', '---→'],
+					['·', '───→'],
 					self::readFile("$projectRoot/tests/fixtures/example-output.php")
 				),
 				'{{FORMATTERS}}' => rtrim(implode(
@@ -72,7 +55,7 @@ class Readmerator
 	private static function normalizePath(string $path): string
 	{
 		if (($normalized = realpath($path)) === false) {
-			throw new RuntimeException("Could not normalize path: $path");
+			throw new RuntimeException("Could not normalize path: $path"); // @codeCoverageIgnore
 		}
 		return $normalized;
 	}
@@ -80,34 +63,9 @@ class Readmerator
 	private static function readFile(string $file): string
 	{
 		if (($content = file_get_contents($file)) === false) {
-			throw new RuntimeException("Could not read file: $file");
+			throw new RuntimeException("Could not read file: $file"); // @codeCoverageIgnore
 		}
 		return $content;
-	}
-
-	private static function diff(string $old, string $new): string
-	{
-		$oldLines = explode("\n", $old);
-		$newLines = explode("\n", $new);
-
-		$max = max(count($oldLines), count($newLines));
-		$output = [];
-
-		for ($i = 0; $i < $max; $i++) {
-			$o = $oldLines[$i] ?? '';
-			$n = $newLines[$i] ?? '';
-
-			if ($o !== $n) {
-				if ($o !== '') {
-					$output[] = "- " . $o;
-				}
-				if ($n !== '') {
-					$output[] = "+ " . $n;
-				}
-			}
-		}
-
-		return implode("\n", $output);
 	}
 
 	/**
@@ -116,7 +74,7 @@ class Readmerator
 	private static function findFiles(string $pattern): array
 	{
 		if (($files = glob($pattern)) === false) {
-			throw new RuntimeException("Could not find files: $pattern");
+			throw new RuntimeException("Could not find files: $pattern"); // @codeCoverageIgnore
 		}
 		return $files;
 	}

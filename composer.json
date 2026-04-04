@@ -23,7 +23,8 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "symfony/process": "^5 || ^6 || ^7 || ^8",
-        "friendsofphp/php-cs-fixer": "^3"
+        "friendsofphp/php-cs-fixer": "^3",
+        "symfony/deprecation-contracts": "^2 || ^3"
     },
     "require-dev": {
         "ext-json": "*",
@@ -47,8 +48,8 @@
     "scripts": {
         "test": "phpunit -dzend_extension=php_xdebug -dxdebug.mode=coverage --colors=always ./tests/",
         "lint": "phpstan analyse --verbose --no-progress --ansi",
-        "readme:rewrite": "\\uuf6429\\PhpCsFixerBlockstring\\Readmerator\\Readmerator::rewrite",
-        "readme:verify": "\\uuf6429\\PhpCsFixerBlockstring\\Readmerator\\Readmerator::verify"
+        "readme:render": "\\uuf6429\\PhpCsFixerBlockstring\\Readmerator\\Readmerator::render",
+        "readme:update": "composer readme:render > README.md"
     },
     "config": {
         "process-timeout": 0,

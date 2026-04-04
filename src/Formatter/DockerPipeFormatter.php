@@ -7,6 +7,8 @@ use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
+use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
  * The minimal setup, stable repeatability, and a rich ecosystem makes Docker images an ideal source of formatting
@@ -21,7 +23,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  *     command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
  *     pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
  *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     stripLastNewLine: true,                     // Remove last line from docker output - typically needed.
+ *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
  * ) ]]
  * ```
  *
@@ -59,14 +61,10 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 	private array $imageDetails;
 
 	/**
-	 * @readonly
-	 */
-	private bool $stripLastNewLine;
-
-	/**
 	 * @param list<string> $options
 	 * @param list<string> $command
 	 * @param 'never'|'missing'|'always' $pullMode
+	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
 		string          $image,
@@ -74,18 +72,31 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 		array           $command = [],
 		string          $pullMode = 'never',
 		?CodecInterface $interpolationCodec = null,
-		bool            $stripLastNewLine = true
+		                $lineEndingNormalizer = true
 	) {
 		$this->image = $image;
 		$this->options = $options;
 		$this->command = $command;
 		$this->pullMode = $pullMode;
 		$this->imageDetails = $this->resolveImageDetails();
-		$this->stripLastNewLine = $stripLastNewLine;
+
+		if (is_bool($lineEndingNormalizer)) {
+			trigger_deprecation(
+				'uuf6429/php-cs-fixer-blockstring',
+				'1.0.4',
+				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
+				__METHOD__
+			);
+			$lineEndingNormalizer = new DefaultNormalizer(
+				DefaultNormalizer::LF,
+				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
+			);
+		}
 
 		parent::__construct(
 			"{$this->imageDetails['platform']};{$this->imageDetails['digest']}",
-			$interpolationCodec
+			$interpolationCodec,
+			$lineEndingNormalizer
 		);
 	}
 
@@ -172,10 +183,6 @@ class DockerPipeFormatter extends AbstractCodecFormatter
 			null
 		);
 
-		$output = $process->mustRun()->getOutput();
-
-		return ($this->stripLastNewLine && substr($output, -1) === "\n")
-			? substr($output, 0, -1)
-			: $output;
+		return $process->mustRun()->getOutput();
 	}
 }
