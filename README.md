@@ -331,14 +331,14 @@ final class MyFormatter extends AbstractCodecFormatter
     }
 }
 
-['formatters' => [ new MyFormatter('1.0', new PlainStringCodec()) ]]
+['formatters' => [ new MyFormatter('1.0') ]]
 ```
 
 Example with an anonymous class:
 
 ```php
 ['formatters' => [
-    new class ('1.0', new PlainStringCodec()) extends AbstractCodecFormatter
+    new class ('1.0') extends AbstractCodecFormatter
     {
         protected function formatContent(string $original): string
         {
@@ -386,7 +386,7 @@ Example:
     versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
     formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    stripLastNewLine: true,                     // Remove last line from cli output - you might need this, depending on the platform/shell.
+    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
 ) ]]
 ```
 
@@ -410,7 +410,7 @@ Example:
     command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
     pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    stripLastNewLine: true,                     // Remove last line from docker output - typically needed.
+    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
 ) ]]
 ```
 
@@ -425,6 +425,7 @@ Example:
     indentSize: 4,                              // The number of spaces defining one indentation level in your project.
     indentChar: "\t",                           // The actual character used for indentation (space or tab).
     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
+    lineEndingNormalizer: null,                // A normalizer for handling end-of-line characters.
 ) ]]
 ```
 
