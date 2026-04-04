@@ -2,15 +2,71 @@
 
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\Fixer;
 
+use InvalidArgumentException;
+use PhpCsFixer\Tokenizer\Tokens;
+use PHPUnit\Framework\TestCase;
+use SplFileInfo;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractCodecFormatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
 
 /**
  * @internal
+ *
+ * @phpstan-import-type TFormatterConfig from BlockStringFixer
  */
-final class BlockStringFixerTest extends AbstractFixerTestCase
+final class BlockStringFixerTest extends TestCase
 {
+	public function testIsRisky(): void
+	{
+		$this->assertTrue((new BlockStringFixer())->isRisky());
+	}
+
+	public function testGetNameMatches(): void
+	{
+		$this->assertSame(BlockStringFixer::NAME, (new BlockStringFixer())->getName());
+	}
+
+	public function testGetPriority(): void
+	{
+		$this->assertSame(0, (new BlockStringFixer())->getPriority());
+	}
+
+	public function testGetDefinition(): void
+	{
+		$this->expectNotToPerformAssertions();
+
+		(new BlockStringFixer())->getDefinition();
+	}
+
+	public function testConfigurationIsRequired(): void
+	{
+		$this->expectExceptionObject(
+			new InvalidArgumentException('Configuration for fixer Uuf6429/block_string is required.')
+		);
+
+		(new BlockStringFixer())->fix(new SplFileInfo('test.php'), new Tokens());
+	}
+
+	/**
+	 * @param TFormatterConfig $config
+	 * @dataProvider provideFixCases
+	 */
+	final public function testApplyFix(array $config, string $input, string $expected): void
+	{
+		$fixer = new BlockStringFixer();
+		$tokens = Tokens::fromCode($input);
+		$fixer->configure($config);
+
+		$fixer->fix(new SplFileInfo('fake.php'), $tokens);
+		$output = $tokens->generateCode();
+
+		$this->assertSame($expected, $output);
+	}
+
+	/**
+	 * @return iterable<array-key, array{config: TFormatterConfig, input: string, expected: string}>
+	 */
 	public static function provideFixCases(): iterable
 	{
 		yield 'nowdoc with unregistered delimiter should be left unchanged' => [
@@ -147,22 +203,5 @@ final class BlockStringFixerTest extends AbstractFixerTestCase
 					HTML;
 				PHP,
 		];
-	}
-
-	public function testIsRisky(): void
-	{
-		$this->assertTrue((new BlockStringFixer())->isRisky());
-	}
-
-	public function testGetDefinition(): void
-	{
-		$this->expectNotToPerformAssertions();
-
-		(new BlockStringFixer())->getDefinition();
-	}
-
-	protected function getFixerClass(): string
-	{
-		return BlockStringFixer::class;
 	}
 }
