@@ -254,14 +254,14 @@ $users·=·$stmt->fetchAll(PDO::FETCH_ASSOC);
 $jsonUsers·=·json_encode($users);
 
 $json·=·<<<"JSON"
----⟶{·····"users":{$jsonUsers},
----⟶····"ascending":···false··}
----⟶JSON;
+───→{·····"users":{$jsonUsers},
+───→····"ascending":···false··}
+───→JSON;
 
 echo·<<<JS
 (function(){·····
 ····const·userData={$json};
----⟶console.log("Active·users:",·userData.users);
+───→console.log("Active·users:",·userData.users);
 })();·····
 JS;
 
@@ -292,16 +292,16 @@ $users·=·$stmt->fetchAll(PDO::FETCH_ASSOC);
 $jsonUsers·=·json_encode($users);
 
 $json·=·<<<"JSON"
----⟶{
----⟶··"ascending":·false,
----⟶··"users":·{$jsonUsers}
----⟶}
----⟶JSON;
+───→{
+───→··"ascending":·false,
+───→··"users":·{$jsonUsers}
+───→}
+───→JSON;
 
 echo·<<<JS
 (function(){
----⟶const·userData={$json};
----⟶console.log("Active·users:",·userData.users);
+───→const·userData={$json};
+───→console.log("Active·users:",·userData.users);
 })();
 JS;
 

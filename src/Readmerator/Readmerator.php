@@ -22,12 +22,12 @@ class Readmerator
 				'{{EXAMPLE_CONFIG}}' => file_get_contents("$projectRoot/tests/fixtures/example-config.php"),
 				'{{EXAMPLE_INPUT}}' => str_replace(
 					[' ', "\t"],
-					['·', '---⟶'],
+					['·', '───→'],
 					self::readFile("$projectRoot/tests/fixtures/example-input.php"),
 				),
 				'{{EXAMPLE_OUTPUT}}' => str_replace(
 					[' ', "\t"],
-					['·', '---⟶'],
+					['·', '───→'],
 					self::readFile("$projectRoot/tests/fixtures/example-output.php")
 				),
 				'{{FORMATTERS}}' => rtrim(implode(
