@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace uuf6429\PhpCsFixerBlockstring\Readmerator;
 
@@ -7,7 +7,7 @@ use RuntimeException;
 /**
  * @internal
  */
-class Readmerator
+final class Readmerator
 {
 	private const PROJECT_ROOT = __DIR__ . '/../../';
 	private const README_TEMPLATE = __DIR__ . '/README.tpl.md';
