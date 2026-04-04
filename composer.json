@@ -47,7 +47,8 @@
     "scripts": {
         "test": "phpunit -dzend_extension=php_xdebug -dxdebug.mode=coverage --colors=always ./tests/",
         "lint": "phpstan analyse --verbose --no-progress --ansi",
-        "readme": "php tools/readmerator/generate.php"
+        "readme:rewrite": "\\uuf6429\\PhpCsFixerBlockstring\\Readmerator\\Readmerator::rewrite",
+        "readme:verify": "\\uuf6429\\PhpCsFixerBlockstring\\Readmerator\\Readmerator::verify"
     },
     "config": {
         "process-timeout": 0,
