@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\Formatter;
 
@@ -8,7 +8,10 @@ use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
 use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter;
 use uuf6429\PhpCsFixerBlockstring\Formatter\ChainFormatter;
 
-class ChainFormatterTest extends TestCase
+/**
+ * @internal
+ */
+final class ChainFormatterTest extends TestCase
 {
 	public function testFormatBlock(): void
 	{

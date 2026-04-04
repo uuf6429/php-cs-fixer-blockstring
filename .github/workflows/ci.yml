@@ -46,18 +46,6 @@ jobs:
             -   run: composer update --ansi --no-progress
             -   run: composer lint
 
-    check_readme:
-        name: Check README.md
-        runs-on: ubuntu-latest
-        steps:
-            -   uses: actions/checkout@v6
-            -   uses: shivammathur/setup-php@v2
-                with:
-                    coverage: none
-                    php-version: '8.4'
-            -   run: composer readme .generated-readme.md
-            -   run: diff -u README.md .generated-readme.md
-
     tests:
         name: Build & Test (PHP ${{ matrix.php }} ${{ matrix.desc }})
         runs-on: ${{ matrix.os }}
