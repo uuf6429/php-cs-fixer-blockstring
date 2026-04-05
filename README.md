@@ -309,6 +309,9 @@ JS;
 
 </details>
 
+> [!TIP]
+> More example configurations ("recipes") can be found in [`uuf6429/php-cs-fixer-blockstring-recipes`].
+
 ## ⭐️ Formatters
 
 ### [AbstractCodecFormatter](./src/Formatter/AbstractCodecFormatter.php)
@@ -451,3 +454,5 @@ needs to be enabled and set up. Configuration is otherwise almost identical to [
 [`InterpolationCodec`]: ./src/InterpolationCodec
 
 [`CliPipeFormatter`]: ./src/Formatter/CliPipeFormatter.php
+
+[`uuf6429/php-cs-fixer-blockstring-recipes`]: https://github.com/uuf6429/php-cs-fixer-blockstring-recipes

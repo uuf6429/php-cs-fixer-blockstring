@@ -165,6 +165,9 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 
 </details>
 
+> [!TIP]
+> More example configurations ("recipes") can be found in [`{{PROJECT_NAME}}-recipes`].
+
 ## ⭐️ Formatters
 
 {{FORMATTERS}}
@@ -186,3 +189,5 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 [`InterpolationCodec`]: ./src/InterpolationCodec
 
 [`CliPipeFormatter`]: ./src/Formatter/CliPipeFormatter.php
+
+[`{{PROJECT_NAME}}-recipes`]: https://github.com/{{PROJECT_NAME}}-recipes
