@@ -103,11 +103,11 @@ abstract class AbstractCodecFormatter extends AbstractFormatter
 
 	private function removeIndentation(string $lines, string $indentation): string
 	{
-		return substr(str_replace("\n{$indentation}", "\n", $lines), strlen($indentation)); // TODO feels wrong (eol)
+		return substr(str_replace("\n{$indentation}", "\n", $lines), strlen($indentation));
 	}
 
 	private function applyIndentation(string $lines, string $indentation): string
 	{
-		return $indentation . str_replace("\n", "\n{$indentation}", $lines); // TODO feels wrong (eol)
+		return $indentation . str_replace("\n", "\n{$indentation}", $lines);
 	}
 }

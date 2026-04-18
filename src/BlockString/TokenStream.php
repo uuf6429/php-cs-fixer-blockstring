@@ -71,7 +71,7 @@ final class TokenStream
 
 	private function extractDelimiter(Token $token): string
 	{
-		return trim($token->getContent(), "<'\"\n");
+		return trim($token->getContent(), "<'\"\r\n");
 	}
 
 	private function extractIndentation(Token $token): string

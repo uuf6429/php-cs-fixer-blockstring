@@ -52,7 +52,7 @@ final class BlockStringFixerTest extends TestCase
 	 * @param TFormatterConfig $config
 	 * @dataProvider provideFixCases
 	 */
-	final public function testApplyFix(array $config, string $input, string $expected): void
+	public function testApplyFix(array $config, string $input, string $expected): void
 	{
 		$fixer = new BlockStringFixer();
 		$tokens = Tokens::fromCode($input);
@@ -91,7 +91,7 @@ final class BlockStringFixerTest extends TestCase
 					'HTML' => new class extends AbstractCodecFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', null);
+							parent::__construct('1');
 						}
 
 						protected function formatContent(string $original): string
@@ -133,7 +133,7 @@ final class BlockStringFixerTest extends TestCase
 					new class extends AbstractCodecFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', null);
+							parent::__construct('2');
 						}
 
 						protected function formatContent(string $original): string
@@ -144,7 +144,7 @@ final class BlockStringFixerTest extends TestCase
 					'HTML' => new class extends AbstractCodecFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', null);
+							parent::__construct('3');
 						}
 
 						protected function formatContent(string $original): string
@@ -180,7 +180,7 @@ final class BlockStringFixerTest extends TestCase
 					'HTML' => new class extends AbstractCodecFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', new GeneratedTokenCodec());
+							parent::__construct('4', new GeneratedTokenCodec());
 						}
 
 						protected function formatContent(string $original): string
@@ -202,6 +202,26 @@ final class BlockStringFixerTest extends TestCase
 					Hello $planet!
 					HTML;
 				PHP,
+		];
+
+		yield 'Windows-style newlines' => [
+			'config' => [
+				'formatters' => [
+					'HTML' => new class extends AbstractCodecFormatter {
+						public function __construct()
+						{
+							parent::__construct('5');
+						}
+
+						protected function formatContent(string $original): string
+						{
+							return strip_tags($original);
+						}
+					},
+				],
+			],
+			'input' => "<?php\r\n\r\necho <<<'HTML'\r\n    <h1>Hello world!</h1>\r\n    HTML;\r\n",
+			'expected' => "<?php\r\n\r\necho <<<'HTML'\r\n    Hello world!\r\n    HTML;\r\n",
 		];
 	}
 }
