@@ -182,7 +182,7 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 
 [`CodecInterface`]: ./src/InterpolationCodec/CodecInterface.php
 
-[`AbstractCodecFormatter`]: ./src/Formatter/AbstractCodecFormatter.php
+[`AbstractStringFormatter`]: ./src/Formatter/AbstractStringFormatter.php
 
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
 

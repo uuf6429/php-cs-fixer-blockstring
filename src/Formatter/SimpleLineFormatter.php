@@ -20,7 +20,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * ) ]]
  * ```
  */
-class SimpleLineFormatter extends AbstractCodecFormatter
+class SimpleLineFormatter extends AbstractStringFormatter
 {
 	/**
 	 * @readonly

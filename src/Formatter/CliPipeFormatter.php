@@ -31,7 +31,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * @phpstan-type TVersion string
  * @phpstan-type TCommand array{cmd: string|list<string>, cwd?: string, env?: array<string, string>}
  */
-class CliPipeFormatter extends AbstractCodecFormatter
+class CliPipeFormatter extends AbstractStringFormatter
 {
 	/**
 	 * @readonly

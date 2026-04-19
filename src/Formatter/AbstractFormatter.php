@@ -7,7 +7,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 
 /**
  * This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
- * not handle string interpolation at all - check out {@see AbstractCodecFormatter} instead.
+ * not handle string interpolation at all - check out {@see AbstractStringFormatter} instead.
  *
  * Extending this class makes sense in two situations:
  *

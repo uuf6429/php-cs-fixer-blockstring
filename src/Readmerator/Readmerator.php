@@ -76,6 +76,9 @@ final class Readmerator
 		if (($files = glob($pattern)) === false) {
 			throw new RuntimeException("Could not find files: $pattern"); // @codeCoverageIgnore
 		}
+
+		usort($files, static fn(string $a, string $b) => str_replace('Formatter', '', $a) <=> str_replace('Formatter', '', $b));
+
 		return $files;
 	}
 }

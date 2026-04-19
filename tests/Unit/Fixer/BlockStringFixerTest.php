@@ -7,7 +7,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
-use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractCodecFormatter;
+use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractStringFormatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
 
 /**
@@ -88,7 +88,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'nowdoc/heredoc html should have tags stripped out' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractCodecFormatter {
+					'HTML' => new class extends AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('1');
@@ -130,7 +130,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'default formatter should apply to everything except other matching formatters' => [
 			'config' => [
 				'formatters' => [
-					new class extends AbstractCodecFormatter {
+					new class extends AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('2');
@@ -141,7 +141,7 @@ final class BlockStringFixerTest extends TestCase
 							return "<def>$original</def>";
 						}
 					},
-					'HTML' => new class extends AbstractCodecFormatter {
+					'HTML' => new class extends AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('3');
@@ -177,7 +177,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'heredoc with with a few variables' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractCodecFormatter {
+					'HTML' => new class extends AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('4', new GeneratedTokenCodec());
@@ -207,7 +207,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'Windows-style newlines' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractCodecFormatter {
+					'HTML' => new class extends AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('5');

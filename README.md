@@ -175,7 +175,7 @@ return (new PhpCsFixer\Config())
 				// 1. A custom formatter that sorts object keys.
 				// 2. A docker-based formatter that runs the json through jq.
 				'JSON' => new Formatter\ChainFormatter(
-					new class extends Formatter\AbstractCodecFormatter {
+					new class extends Formatter\AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
@@ -314,7 +314,23 @@ JS;
 
 ## ⭐️ Formatters
 
+### [AbstractFormatter](./src/Formatter/AbstractFormatter.php)
+
+This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
+not handle string interpolation at all - check out [`AbstractStringFormatter`] instead.
+
+Extending this class makes sense in two situations:
+
+1. If your class is infrastructural, and you don't really need to handle string interpolation - just like
+   [`ChainFormatter`]
+2. Or if, for whatever reason, the [`CodecInterface`] concept does not work for you and you want to write
+   something from scratch.
+
 ### [AbstractCodecFormatter](./src/Formatter/AbstractCodecFormatter.php)
+
+_Deprecated in favour of [`AbstractStringFormatter`]._
+
+### [AbstractStringFormatter](./src/Formatter/AbstractStringFormatter.php)
 
 This formatter base class is aware of string interpolation - it passes content through a codec before and after
 formatting (to properly handle string interpolation).
@@ -326,7 +342,7 @@ It can be used to embed any kind of formatter, including (native) PHP-based ones
 Example with your own custom class:
 
 ```php
-final class MyFormatter extends AbstractCodecFormatter
+final class MyFormatter extends AbstractStringFormatter
 {
     protected function formatContent(string $original): string
     {
@@ -341,7 +357,7 @@ Example with an anonymous class:
 
 ```php
 ['formatters' => [
-    new class ('1.0') extends AbstractCodecFormatter
+    new class ('1.0') extends AbstractStringFormatter
     {
         protected function formatContent(string $original): string
         {
@@ -350,18 +366,6 @@ Example with an anonymous class:
     }
 ]]
 ```
-
-### [AbstractFormatter](./src/Formatter/AbstractFormatter.php)
-
-This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
-not handle string interpolation at all - check out [`AbstractCodecFormatter`] instead.
-
-Extending this class makes sense in two situations:
-
-1. If your class is infrastructural, and you don't really need to handle string interpolation - just like
-   [`ChainFormatter`]
-2. Or if, for whatever reason, the [`CodecInterface`] concept does not work for you and you want to write
-   something from scratch.
 
 ### [ChainFormatter](./src/Formatter/ChainFormatter.php)
 
@@ -447,7 +451,7 @@ needs to be enabled and set up. Configuration is otherwise almost identical to [
 
 [`CodecInterface`]: ./src/InterpolationCodec/CodecInterface.php
 
-[`AbstractCodecFormatter`]: ./src/Formatter/AbstractCodecFormatter.php
+[`AbstractStringFormatter`]: ./src/Formatter/AbstractStringFormatter.php
 
 [`ChainFormatter`]: ./src/Formatter/ChainFormatter.php
 

@@ -29,7 +29,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *
  * @phpstan-type TDockerImageDetails array{platform: string, digest: string}
  */
-class DockerPipeFormatter extends AbstractCodecFormatter
+class DockerPipeFormatter extends AbstractStringFormatter
 {
 	/**
 	 * @readonly

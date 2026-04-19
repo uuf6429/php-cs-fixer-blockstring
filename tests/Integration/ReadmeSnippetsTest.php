@@ -33,7 +33,7 @@ final class ReadmeSnippetsTest extends TestCase
 	{
 		$snippet = <<<"PHP"
 			use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter;
-			use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractCodecFormatter;
+			use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractStringFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\DockerPipeFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\SimpleLineFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\CliPipeFormatter;

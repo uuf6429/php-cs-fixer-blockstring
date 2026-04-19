@@ -31,7 +31,7 @@ return (new PhpCsFixer\Config())
 				// 1. A custom formatter that sorts object keys.
 				// 2. A docker-based formatter that runs the json through jq.
 				'JSON' => new Formatter\ChainFormatter(
-					new class extends Formatter\AbstractCodecFormatter {
+					new class extends Formatter\AbstractStringFormatter {
 						public function __construct()
 						{
 							parent::__construct('1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
