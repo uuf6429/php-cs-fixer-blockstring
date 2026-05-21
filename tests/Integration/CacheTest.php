@@ -26,11 +26,6 @@ final class CacheTest extends TestCase
 		copy(__DIR__ . '/../fixtures/simple-input.php', self::$inputFile);
 	}
 
-	protected function setUp(): void
-	{
-		touch(self::$inputFile);
-	}
-
 	public static function tearDownAfterClass(): void
 	{
 		@unlink(self::$inputFile);
@@ -39,13 +34,19 @@ final class CacheTest extends TestCase
 	}
 
 	/**
-	 * @testWith ["v1.0", "Fixed 1 of 1 files"]
-	 *           ["v1.0", "Fixed 0 of 1 files"]
-	 *           ["v1.1", "Fixed 1 of 1 files"]
-	 *           ["v1.1", "Fixed 0 of 1 files"]
+	 * @testWith ["v1.0", "Fixed 1 of 1 files", "Cache file did not exist"]
+	 *           ["v1.0", "Fixed 0 of 1 files", "Cache file existed already"]
+	 *           ["v1.1", "Fixed 1 of 1 files", "Cache file existed already"]
+	 *           ["v1.1", "Fixed 0 of 1 files", "Cache file existed already"]
 	 */
-	public function testCacheReuse(string $fixerVersion, string $expectedOutput): void
-	{
+	public function testCacheReuse(
+		string $fixerVersion,
+		string $expectedProcessOutput,
+		string $expectedCacheFileExistence
+	): void {
+		$cacheFileExistence = file_exists(self::$cacheFile)
+			? 'Cache file existed already'
+			: 'Cache file did not exist';
 		$process = new Process(
 			[
 				'php',
@@ -67,7 +68,8 @@ final class CacheTest extends TestCase
 
 		$output = $process->getErrorOutput() . $process->getOutput();
 
+		$this->assertSame($expectedCacheFileExistence, $cacheFileExistence);
 		$this->assertFileEquals(__DIR__ . '/../fixtures/simple-output.php', self::$inputFile);
-		$this->assertStringContainsString($expectedOutput, $output);
+		$this->assertStringContainsString($expectedProcessOutput, $output);
 	}
 }
