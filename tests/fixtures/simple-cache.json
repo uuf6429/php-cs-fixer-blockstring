@@ -1,0 +1,19 @@
+{
+    "rules": {
+        "Uuf6429\/block_string": {
+            "formatters": {
+                "JSON": [
+                    "TEST_FORMATTER_CACHE_FINGERPRINT",
+                    [
+                        "uuf6429\\PhpCsFixerBlockstring\\InterpolationCodec\\PlainStringCodec"
+                    ],
+                    [
+                        "uuf6429\\PhpCsFixerBlockstring\\LineEndingNormalizer\\DefaultNormalizer",
+                        "noop",
+                        "noop"
+                    ]
+                ]
+            }
+        }
+    }
+}

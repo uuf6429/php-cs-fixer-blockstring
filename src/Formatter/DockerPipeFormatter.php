@@ -94,7 +94,18 @@ class DockerPipeFormatter extends AbstractStringFormatter
 		}
 
 		parent::__construct(
-			"{$this->imageDetails['platform']};{$this->imageDetails['digest']}",
+			sprintf(
+				'%s: %s',
+				static::class,
+				implode(
+					' ',
+					array_merge(
+						["{$this->imageDetails['platform']};{$this->imageDetails['digest']}"],
+						$this->options,
+						$this->command
+					)
+				)
+			),
 			$interpolationCodec,
 			$lineEndingNormalizer
 		);

@@ -29,9 +29,12 @@ final class ChainFormatter extends AbstractFormatter
 	 */
 	public function __construct(AbstractFormatter ...$formatters)
 	{
-		parent::__construct('1.0');
-
 		$this->formatters = array_values($formatters);
+
+		parent::__construct([
+			self::class,
+			array_map(static fn(AbstractFormatter $formatter) => $formatter->getCacheFingerprint(), $this->formatters),
+		]);
 	}
 
 	public function formatBlock(BlockString $blockString): BlockString

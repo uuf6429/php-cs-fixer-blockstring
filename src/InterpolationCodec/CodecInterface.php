@@ -3,8 +3,9 @@
 namespace uuf6429\PhpCsFixerBlockstring\InterpolationCodec;
 
 use uuf6429\PhpCsFixerBlockstring\BlockString\SegmentInterface;
+use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
 
-interface CodecInterface
+interface CodecInterface extends CacheFingerprintableInterface
 {
 	/**
 	 * @param list<SegmentInterface> $segments

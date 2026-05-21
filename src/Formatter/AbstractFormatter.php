@@ -2,7 +2,9 @@
 
 namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
+use JsonSerializable;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
+use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 
 /**
@@ -16,24 +18,48 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  * 2. Or if, for whatever reason, the {@see CodecInterface} concept does not work for you and you want to write
  *    something from scratch.
  */
-abstract class AbstractFormatter
+abstract class AbstractFormatter implements CacheFingerprintableInterface, JsonSerializable
 {
 	/**
+	 * @var mixed
 	 * @readonly
 	 */
-	protected string $version;
+	private $cacheFingerprint;
 
 	/**
-	 * @param string $version A string representing a version of this formatter, used for caching purposes.
-	 * For example, if the formatting algorithm/logic is changed, the version should also be different.
+	 * @param mixed $cacheFingerprint A unique representation of the formatter logic and its configuration, used for
+	 * caching purposes. For example, if the formatter executes some cli command with a specific version, the
+	 * fingerprint should contain:
+	 * - the formatter class (to distguish from other formatters)
+	 * - the cli command name (since it's a setting of the formatter)
+	 * - the cli command version (in case the cli command gets updated at some point)
+	 *
+	 * **Important:** Make sure that the fingerprint contains simple values (null, scalar or arrays).
 	 */
-	public function __construct(string $version)
+	public function __construct($cacheFingerprint)
 	{
-		$this->version = $version;
+		$this->cacheFingerprint = $cacheFingerprint;
 	}
 
 	/**
 	 * Format the provided BlockString accordingly and return a new one.
 	 */
 	abstract public function formatBlock(BlockString $blockString): BlockString;
+
+	/**
+	 * @return mixed
+	 */
+	final public function getCacheFingerprint()
+	{
+		return $this->cacheFingerprint;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
+	final public function jsonSerialize()
+	{
+		return $this->getCacheFingerprint();
+	}
 }

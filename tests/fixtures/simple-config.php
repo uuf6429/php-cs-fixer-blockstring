@@ -12,7 +12,7 @@ return (new PhpCsFixer\Config())
 				'JSON' => new class extends Formatter\AbstractStringFormatter {
 					public function __construct()
 					{
-						parent::__construct(getenv('TEST_FIXER_VERSION'));
+						parent::__construct(getenv('TEST_FORMATTER_CACHE_FINGERPRINT'));
 					}
 
 					public function formatContent(string $original): string

@@ -34,7 +34,7 @@ return (new PhpCsFixer\Config())
 					new class extends Formatter\AbstractStringFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
+							parent::__construct('ObjectKeySorter v1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
 						}
 
 						public function formatContent(string $original): string

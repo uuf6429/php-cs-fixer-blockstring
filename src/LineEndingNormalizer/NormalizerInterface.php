@@ -2,7 +2,9 @@
 
 namespace uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer;
 
-interface NormalizerInterface
+use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
+
+interface NormalizerInterface extends CacheFingerprintableInterface
 {
 	public function normalize(string $formatted, string $original): string;
 }

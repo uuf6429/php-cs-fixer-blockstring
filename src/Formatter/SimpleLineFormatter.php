@@ -61,7 +61,7 @@ class SimpleLineFormatter extends AbstractStringFormatter
 			);
 		}
 
-		parent::__construct('1', $interpolationCodec, $lineEndingNormalizer);
+		parent::__construct(static::class . ' v1', $interpolationCodec, $lineEndingNormalizer);
 	}
 
 	protected function formatContent(string $original): string

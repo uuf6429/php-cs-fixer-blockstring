@@ -3,7 +3,6 @@
 namespace uuf6429\PhpCsFixerBlockstring\InterpolationCodec;
 
 use RuntimeException;
-use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
 
 final class PlainStringCodec implements CodecInterface
@@ -20,5 +19,10 @@ final class PlainStringCodec implements CodecInterface
 	public function decode(CodecResult $result): array
 	{
 		return [new StringSegment($result->content)];
+	}
+
+	public function getCacheFingerprint()
+	{
+		return [self::class];
 	}
 }

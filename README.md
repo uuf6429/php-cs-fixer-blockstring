@@ -178,7 +178,7 @@ return (new PhpCsFixer\Config())
 					new class extends Formatter\AbstractStringFormatter {
 						public function __construct()
 						{
-							parent::__construct('1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
+							parent::__construct('ObjectKeySorter v1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
 						}
 
 						public function formatContent(string $original): string
@@ -325,10 +325,6 @@ Extending this class makes sense in two situations:
    [`ChainFormatter`]
 2. Or if, for whatever reason, the [`CodecInterface`] concept does not work for you and you want to write
    something from scratch.
-
-### [AbstractCodecFormatter](./src/Formatter/AbstractCodecFormatter.php)
-
-_Deprecated in favour of [`AbstractStringFormatter`]._
 
 ### [AbstractStringFormatter](./src/Formatter/AbstractStringFormatter.php)
 

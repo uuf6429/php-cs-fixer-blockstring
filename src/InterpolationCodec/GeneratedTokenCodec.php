@@ -3,8 +3,10 @@
 namespace uuf6429\PhpCsFixerBlockstring\InterpolationCodec;
 
 use LogicException;
+use RuntimeException;
 use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
+use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
 
 final class GeneratedTokenCodec implements CodecInterface
 {
@@ -106,5 +108,29 @@ final class GeneratedTokenCodec implements CodecInterface
 		}
 
 		return $segments;
+	}
+
+	public function getCacheFingerprint()
+	{
+		return [self::class, $this->tokenPattern, $this->getTokenFactoryCacheFingerprint()];
+	}
+
+	/**
+	 * @return mixed
+	 */
+	private function getTokenFactoryCacheFingerprint()
+	{
+		if (!is_object($this->tokenFactory)) {
+			return $this->tokenFactory;
+		}
+
+		if ($this->tokenFactory instanceof CacheFingerprintableInterface) {
+			return $this->tokenFactory->getCacheFingerprint();
+		}
+
+		throw new RuntimeException(
+			'Token factory must implement CacheFingerprintableInterface - it cannot be a simple closure object.'
+			. ' A possibility is to make an anonymous object implementing that interface and an __invoke method.'
+		);
 	}
 }

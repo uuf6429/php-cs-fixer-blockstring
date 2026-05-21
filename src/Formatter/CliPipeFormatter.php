@@ -67,9 +67,16 @@ class CliPipeFormatter extends AbstractStringFormatter
 		}
 
 		parent::__construct(
-			is_string($versionValueOrCommand)
-				? $versionValueOrCommand
-				: $this->exec($versionValueOrCommand, null),
+			sprintf(
+				'%s: %s v%s',
+				static::class,
+				is_array($this->formatter['cmd'])
+					? implode(' ', $this->formatter['cmd'])
+					: $this->formatter['cmd'],
+				is_string($versionValueOrCommand)
+					? $versionValueOrCommand
+					: $this->exec($versionValueOrCommand, null)
+			),
 			$interpolationCodec,
 			$lineEndingNormalizer
 		);

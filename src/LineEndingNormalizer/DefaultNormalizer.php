@@ -43,6 +43,11 @@ class DefaultNormalizer implements NormalizerInterface
 		);
 	}
 
+	public function getCacheFingerprint()
+	{
+		return [static::class, $this->changeLinesTo, $this->changeFinalLineTo];
+	}
+
 	private function normalizeLineEnding(string $text, string $original): string
 	{
 		switch ($this->changeLinesTo) {
