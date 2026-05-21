@@ -27,7 +27,7 @@ composer require uuf6429/php-cs-fixer-blockstring --dev
 Finally, register a custom fixer in your `.php-cs-fixer.php` config file (1️⃣) and then set up formatters (2️⃣):
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use PhpCsFixer;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
