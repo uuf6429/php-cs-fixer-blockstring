@@ -12,19 +12,15 @@ use uuf6429\PhpCsFixerBlockstring\Formatter\WslPipeFormatter;
  */
 final class WslPipeFormatterTest extends TestCase
 {
-	protected function setUp(): void
-	{
-		parent::setUp();
-
-		if (PHP_OS_FAMILY === 'Windows' && getenv('GITHUB_ACTIONS') === 'true') {
-			$this->markTestSkipped(
-				'GitHub actions are not able to run non-Windows docker images: https://github.com/orgs/community/discussions/138554'
-			);
-		}
-	}
-
 	public function testFormat(): void
 	{
+		if (PHP_OS_FAMILY !== 'Windows') {
+			$this->markTestSkipped('WSL is only available on Windows');
+		}
+		if (getenv('GITHUB_ACTIONS') === 'true') {
+			$this->markTestSkipped('WSL on GitHub Actions is poorly supported and unusable');
+		}
+
 		$formatter = new WslPipeFormatter(
 			['cmd' => 'php -v'],
 			['cmd' => ['php', '-r', 'echo strrev(stream_get_contents(STDIN));']]
