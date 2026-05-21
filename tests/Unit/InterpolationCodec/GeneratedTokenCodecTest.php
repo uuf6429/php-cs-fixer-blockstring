@@ -5,8 +5,10 @@ namespace uuf6429\PhpCsFixerBlockstringTests\Unit\InterpolationCodec;
 use LogicException;
 use PhpCsFixer\Tokenizer\Token;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
+use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecResult;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
 
@@ -66,5 +68,39 @@ final class GeneratedTokenCodecTest extends TestCase
 			),
 			$result
 		);
+	}
+
+	public function testThatTokenFactoryCanBeSimpleCallable(): void
+	{
+		/** @phpstan-ignore argument.type */
+		$codec = new GeneratedTokenCodec('<some-pattern>', 'array_map');
+
+		$this->assertSame([GeneratedTokenCodec::class, '<some-pattern>', 'array_map'], $codec->getCacheFingerprint());
+	}
+
+	public function testThatTokenFactoryCannotBeBeSimpleClosure(): void
+	{
+		$codec = new GeneratedTokenCodec('<some-pattern>', static fn() => null);
+
+		$this->expectExceptionObject(new RuntimeException('Token factory must implement CacheFingerprintableInterface'));
+
+		$codec->getCacheFingerprint();
+	}
+
+	public function testThatTokenFactoryCanBeCachableInvokable(): void
+	{
+		$codec = new GeneratedTokenCodec('<some-pattern>', new class implements CacheFingerprintableInterface {
+			public function __invoke(): string
+			{
+				return 'xx';
+			}
+
+			public function getCacheFingerprint()
+			{
+				return 'fingerprint';
+			}
+		});
+
+		$this->assertSame([GeneratedTokenCodec::class, '<some-pattern>', 'fingerprint'], $codec->getCacheFingerprint());
 	}
 }
