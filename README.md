@@ -339,12 +339,12 @@ return (new PhpCsFixer\Config())
     ->setRules([
         BlockStringFixer::NAME => BlockStringFixer::config([
             'JSON' => new ChainFormatter(
-                new FirstFormatter(),
-                new SecondFormatter(),
+                new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
+                new SimpleLineFormatter(4, "\t"),
             ),
         ]),
     ]);
- ```
+```
 
 ### [CliPipeFormatter](./src/Formatter/CliPipeFormatter.php)
 

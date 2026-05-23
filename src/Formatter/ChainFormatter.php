@@ -16,12 +16,12 @@ use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
  *     ->setRules([
  *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'JSON' => new ChainFormatter(
- *                 new FirstFormatter(),
- *                 new SecondFormatter(),
+ *                 new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
+ *                 new SimpleLineFormatter(4, "\t"),
  *             ),
  *         ]),
  *     ]);
- *  ```
+ * ```
  */
 final class ChainFormatter extends AbstractFormatter
 {
