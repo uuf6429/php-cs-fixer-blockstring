@@ -9,7 +9,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
- * This formatter base class is aware of string interpolation - it passes content through a codec before and after
+ * This formatter base class is aware of string interpolation – it passes content through a codec before and after
  * formatting (to properly handle string interpolation).
  *
  * Additionally, it keeps an in-memory cache of formatted content to avoid unnecessary work within the same process.

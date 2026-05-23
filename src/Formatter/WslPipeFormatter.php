@@ -7,8 +7,8 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
- * A formatter making use of Windows Subsystem for Linux (WSL). Of course you will need to be running on Windows and WSL
- * needs to be enabled and set up. Configuration is otherwise almost identical to {@see CliPipeFormatter}.
+ * A formatter making use of Windows Subsystem for Linux (WSL). Of course, you will need to be running on Windows,
+ * and WSL needs to be enabled and set up. Configuration is otherwise almost identical to {@see CliPipeFormatter}.
  */
 class WslPipeFormatter extends CliPipeFormatter
 {

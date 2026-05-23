@@ -34,9 +34,9 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *
  * The command definition (for version detection or formatting) is an array with the following structure:
  *
- * - `cmd` - array/string - The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
- * - `cwd` - (optional) string - The current working directory of the command.
- * - `env` - (optional) array of string keys and values - Environment variables to pass to the command.
+ * - `cmd` `array`/`string`: The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
+ * - `cwd` (optional) `string`: The current working directory of the command.
+ * - `env` (optional) `array` of `string` keys and values: Environment variables to pass to the command.
  *
  * @phpstan-type TVersion string
  * @phpstan-type TCommand array{cmd: string|list<string>, cwd?: string, env?: array<string, string>}

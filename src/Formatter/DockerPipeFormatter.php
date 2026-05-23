@@ -11,7 +11,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
 
 /**
- * The minimal setup, stable repeatability, and a rich ecosystem makes Docker images an ideal source of formatting
+ * The minimal setup, stable repeatability, and a rich ecosystem make Docker images an ideal source of formatting
  * tools. This formatter exists to take advantage of that.
  *
  * Example:

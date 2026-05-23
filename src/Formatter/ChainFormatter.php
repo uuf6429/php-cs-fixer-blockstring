@@ -5,7 +5,7 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 
 /**
- * This formatter allows multiple formatters to be applied sequentially - the output of each formatter becomes the
+ * This formatter allows multiple formatters to be applied sequentially – the output of each formatter becomes the
  * input of the next one.
  *
  * Example:
