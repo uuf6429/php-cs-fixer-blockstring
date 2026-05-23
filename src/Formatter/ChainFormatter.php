@@ -10,11 +10,17 @@ use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
  *
  * Example:
  *
- *  ```php
- *  ['formatters' => [ new ChainFormatter(
- *      new FirstFormatter(),
- *      new SecondFormatter(),
- *  ) ]]
+ * ```php
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
+ *             'JSON' => new ChainFormatter(
+ *                 new FirstFormatter(),
+ *                 new SecondFormatter(),
+ *             ),
+ *         ]),
+ *     ]);
  *  ```
  */
 final class ChainFormatter extends AbstractFormatter

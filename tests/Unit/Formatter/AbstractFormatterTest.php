@@ -20,6 +20,6 @@ final class AbstractFormatterTest extends TestCase
 			}
 		};
 
-		$this->assertSame('"fingerprint"', json_encode($formatter));
+		$this->assertSame('fingerprint', $formatter->getCacheFingerprint());
 	}
 }

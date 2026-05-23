@@ -23,14 +23,14 @@ final class ExampleTest extends TestCase
 		$tempFile = tempnam(sys_get_temp_dir(), '');
 
 		try {
-			copy(__DIR__ . '/../fixtures/example-input.php', $tempFile);
+			copy(__DIR__ . '/../Fixtures/Scenarios/example/input.php', $tempFile);
 			$process = new Process(
 				[
 					PHP_BINARY,
 					self::PCF_BINARY_PATH,
 					'fix',
 					'--using-cache=no',
-					'--config=' . __DIR__ . '/../fixtures/example-config.php',
+					'--config=' . __DIR__ . '/../Fixtures/Scenarios/example/config.php',
 					'--sequential',
 					'-vvv',
 					'--diff',
@@ -44,7 +44,7 @@ final class ExampleTest extends TestCase
 
 			$process->mustRun();
 
-			$this->assertFileEquals(__DIR__ . '/../fixtures/example-output.php', $tempFile);
+			$this->assertFileEquals(__DIR__ . '/../Fixtures/Scenarios/example/output.php', $tempFile);
 		} finally {
 			@unlink($tempFile);
 		}

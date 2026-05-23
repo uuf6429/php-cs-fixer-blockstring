@@ -14,12 +14,22 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * Example:
  *
  * ```php
- * ['formatters' => [ new CliPipeFormatter(
- *     versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
- *     formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
- *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
- * ) ]]
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
+ *             'J' => new CliPipeFormatter(
+ *                 // Either a version as a string, or the command to get the version (as an array).
+ *                 versionValueOrCommand: '1.0',
+ *                 // An array defining the external command to do the formatting.
+ *                 formatCommand: ['cmd' => 'jfmt -'],
+ *                 // A codec for handling placeholers in template strings; depends on the content being formatted.
+ *                 interpolationCodec: new PlainStringCodec(),
+ *                 // A normalizer for handling end-of-line characters.
+ *                 lineEndingNormalizer: null
+ *             )
+ *         ]),
+ *     ]);
  * ```
  *
  * The command definition (for version detection or formatting) is an array with the following structure:

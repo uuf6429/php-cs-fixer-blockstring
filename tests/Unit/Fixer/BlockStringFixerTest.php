@@ -7,13 +7,13 @@ use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
-use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractStringFormatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
+use uuf6429\PhpCsFixerBlockstringTests\Fixtures;
 
 /**
  * @internal
  *
- * @phpstan-import-type TFormatterConfig from BlockStringFixer
+ * @phpstan-import-type TSerializedConfig from BlockStringFixer
  */
 final class BlockStringFixerTest extends TestCase
 {
@@ -39,17 +39,27 @@ final class BlockStringFixerTest extends TestCase
 		(new BlockStringFixer())->getDefinition();
 	}
 
-	public function testConfigurationIsRequired(): void
+	public function testGetConfigurationDefinition(): void
 	{
-		$this->expectExceptionObject(
-			new InvalidArgumentException('Configuration for fixer Uuf6429/block_string is required.')
-		);
+		$this->expectNotToPerformAssertions();
 
-		(new BlockStringFixer())->fix(new SplFileInfo('test.php'), new Tokens());
+		(new BlockStringFixer())->getConfigurationDefinition();
+	}
+
+	public function testConfigureWithInvalidConfiguration(): void
+	{
+		$this->expectExceptionObject(new InvalidArgumentException('BlockStringFixer configuration is not valid.'));
+
+		(new BlockStringFixer())->configure(['formatters' => 'invalid']);
+	}
+
+	public function testConfig(): void
+	{
+		$this->assertSame(['formatters' => 'a:0:{}'], BlockStringFixer::config([]));
 	}
 
 	/**
-	 * @param TFormatterConfig $config
+	 * @param TSerializedConfig $config
 	 * @dataProvider provideFixCases
 	 */
 	public function testApplyFix(array $config, string $input, string $expected): void
@@ -65,12 +75,12 @@ final class BlockStringFixerTest extends TestCase
 	}
 
 	/**
-	 * @return iterable<array-key, array{config: TFormatterConfig, input: string, expected: string}>
+	 * @return iterable<array-key, array{config: TSerializedConfig, input: string, expected: string}>
 	 */
 	public static function provideFixCases(): iterable
 	{
 		yield 'nowdoc with unregistered delimiter should be left unchanged' => [
-			'config' => ['formatters' => []],
+			'config' => BlockStringFixer::config([]),
 			'input' => <<<'PHP'
 				<?php declare(strict_types=1);
 				echo <<<'HTML'
@@ -86,21 +96,11 @@ final class BlockStringFixerTest extends TestCase
 		];
 
 		yield 'nowdoc/heredoc html should have tags stripped out' => [
-			'config' => [
-				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('1');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
-				],
-			],
+			'config' => BlockStringFixer::config(
+				[
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(null),
+				]
+			),
 			'input' => <<<'PHP'
 				<?php declare(strict_types=1);
 				echo <<<'HTML'
@@ -128,32 +128,12 @@ final class BlockStringFixerTest extends TestCase
 		];
 
 		yield 'default formatter should apply to everything except other matching formatters' => [
-			'config' => [
-				'formatters' => [
-					new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('2');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return "<def>$original</def>";
-						}
-					},
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('3');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return "<htm>$original</htm>";
-						}
-					},
-				],
-			],
+			'config' => BlockStringFixer::config(
+				[
+					new fixtures\Formatters\TagWrapper('def'),
+					'HTML' => new fixtures\Formatters\TagWrapper('htm'),
+				]
+			),
 			'input' => <<<'PHP'
 				<?php declare(strict_types=1);
 				echo <<<'HTML'
@@ -175,21 +155,11 @@ final class BlockStringFixerTest extends TestCase
 		];
 
 		yield 'heredoc with with a few variables' => [
-			'config' => [
-				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('4', new GeneratedTokenCodec());
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
-				],
-			],
+			'config' => BlockStringFixer::config(
+				[
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(new GeneratedTokenCodec()),
+				]
+			),
 			'input' => <<<'PHP'
 				<?php declare(strict_types=1);
 				echo <<<"HTML"
@@ -205,21 +175,11 @@ final class BlockStringFixerTest extends TestCase
 		];
 
 		yield 'Windows-style newlines' => [
-			'config' => [
-				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('5');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
-				],
-			],
+			'config' => BlockStringFixer::config(
+				[
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(null),
+				]
+			),
 			'input' => "<?php\r\n\r\necho <<<'HTML'\r\n    <h1>Hello world!</h1>\r\n    HTML;\r\n",
 			'expected' => "<?php\r\n\r\necho <<<'HTML'\r\n    Hello world!\r\n    HTML;\r\n",
 		];

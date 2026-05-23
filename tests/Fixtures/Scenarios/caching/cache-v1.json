@@ -1,0 +1,7 @@
+{
+    "rules": {
+        "Uuf6429\/block_string": {
+            "formatters": "a:1:{s:4:\"JSON\";O:68:\"uuf6429\\PhpCsFixerBlockstringTests\\Fixtures\\Formatters\\JsonCommenter\":5:{s:77:\"\u0000uuf6429\\PhpCsFixerBlockstringTests\\Fixtures\\Formatters\\JsonCommenter\u0000comment\";s:16:\"JsonCommenter v1\";s:76:\"\u0000uuf6429\\PhpCsFixerBlockstring\\Formatter\\AbstractStringFormatter\u0000objectIndex\";i:0;s:21:\"\u0000*\u0000interpolationCodec\";O:65:\"uuf6429\\PhpCsFixerBlockstring\\InterpolationCodec\\PlainStringCodec\":0:{}s:85:\"\u0000uuf6429\\PhpCsFixerBlockstring\\Formatter\\AbstractStringFormatter\u0000lineEndingNormalizer\";O:68:\"uuf6429\\PhpCsFixerBlockstring\\LineEndingNormalizer\\DefaultNormalizer\":2:{s:83:\"\u0000uuf6429\\PhpCsFixerBlockstring\\LineEndingNormalizer\\DefaultNormalizer\u0000changeLinesTo\";s:4:\"noop\";s:87:\"\u0000uuf6429\\PhpCsFixerBlockstring\\LineEndingNormalizer\\DefaultNormalizer\u0000changeFinalLineTo\";s:4:\"noop\";}s:75:\"\u0000uuf6429\\PhpCsFixerBlockstring\\Formatter\\AbstractFormatter\u0000cacheFingerprint\";a:3:{i:0;s:87:\"uuf6429\\PhpCsFixerBlockstringTests\\Fixtures\\Formatters\\JsonCommenter (JsonCommenter v1)\";i:1;a:1:{i:0;s:65:\"uuf6429\\PhpCsFixerBlockstring\\InterpolationCodec\\PlainStringCodec\";}i:2;a:3:{i:0;s:68:\"uuf6429\\PhpCsFixerBlockstring\\LineEndingNormalizer\\DefaultNormalizer\";i:1;s:4:\"noop\";i:2;s:4:\"noop\";}}}}"
+        }
+    }
+}

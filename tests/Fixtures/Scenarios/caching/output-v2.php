@@ -2,9 +2,9 @@
 
 echo <<<'JSON'
 	{
-	    "_comment": "JsonFormatterV2",
 	    "users": [],
-	    "ascending": false
+	    "ascending": false,
+	    "_comment": "JsonCommenter v2"
 	}
 	JSON;
 

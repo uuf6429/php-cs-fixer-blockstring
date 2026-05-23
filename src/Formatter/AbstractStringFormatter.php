@@ -21,27 +21,28 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * ```php
  * final class MyFormatter extends AbstractStringFormatter
  * {
+ *     public function __construct()
+ *     {
+ *         // It is required to pass a value to the parent constructor as a first argument. This value is used to
+ *         // invalidate the cache when your formatter logic is changed (e.g. versioning) or its settings change.
+ *         // The bare minimum is to pass the class name, but you can also pass a more complex value (e.g. an array
+ *         // of settings). Avoid passing objects though, especially non-serializable ones.
+ *         parent::__construct(self::class);
+ *     }
+ *
  *     protected function formatContent(string $original): string
  *     {
  *         return 'new content';
  *     }
  * }
  *
- * ['formatters' => [ new MyFormatter('1.0') ]]
- * ```
- *
- * Example with an anonymous class:
- *
- * ```php
- * ['formatters' => [
- *     new class ('1.0') extends AbstractStringFormatter
- *     {
- *         protected function formatContent(string $original): string
- *         {
- *             return 'new content';
- *         }
- *     }
- * ]]
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
+ *             'TEXT' => new MyFormatter(),
+ *         ]),
+ *     ]);
  * ```
  */
 abstract class AbstractStringFormatter extends AbstractFormatter

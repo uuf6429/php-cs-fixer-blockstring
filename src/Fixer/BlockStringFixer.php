@@ -18,10 +18,10 @@ use const T_START_HEREDOC;
 
 /**
  * @phpstan-type TFormatters array<0|non-empty-string, AbstractFormatter>
- * @phpstan-type TDeserilizedConfig array{formatters: TFormatters}
- * @phpstan-type TSerializedConfig array{formatters: string}
+ * @phpstan-type TDeserializedConfig array{formatters: TFormatters}
+ * @phpstan-type TSerializedConfig array{formatters?: string}
  *
- * @implements ConfigurableFixerInterface<TSerializedConfig, TDeserilizedConfig>
+ * @implements ConfigurableFixerInterface<TSerializedConfig, TDeserializedConfig>
  */
 final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterface
 {
@@ -30,7 +30,7 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 	private ?FixerConfigurationResolverInterface $configurationDefinition = null;
 
 	/**
-	 * @var TDeserilizedConfig
+	 * @var TDeserializedConfig
 	 */
 	private array $configuration;
 
@@ -77,21 +77,19 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 			]);
 	}
 
-	/**
-	 * @param TDeserilizedConfig $configuration
-	 * @return void
-	 */
 	public function configure(array $configuration): void
 	{
-		if (isset($configuration['formatters']) && !is_string($configuration['formatters'])) {
+		$formatters = $configuration['formatters'] ?? 'a:0:{}';
+		if (($formatters = @unserialize($formatters, ['allowed_classes' => true])) === false) {
 			throw new InvalidArgumentException(
 				'BlockStringFixer configuration is not valid. '
 				. 'Did you set it up in your PHP CS Fixer config with `BlockStringFixer::config()`?'
 			);
 		}
 
+		// @phpstan-ignore assign.propertyType
 		$this->configuration = [
-			'formatters' => unserialize($configuration['formatters'] ?? 'a:0:{}', ['allowed_classes' => true]),
+			'formatters' => $formatters,
 		];
 	}
 

@@ -17,14 +17,26 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * Example:
  *
  * ```php
- * ['formatters' => [ new DockerPipeFormatter(
- *     image: 'ghcr.io/jqlang/jq',                 // The docker image; might contain url, tag or even the digest.
- *     options: ['-e', 'SOME_ENV=value'],          // Optional docker arguments, such as for setting env vars.
- *     command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
- *     pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
- *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
- * ) ]]
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
+ *             'JSON' => new DockerPipeFormatter(
+ *                 // The docker image; might contain url, tag or even the digest.
+ *                 image: 'ghcr.io/jqlang/jq',
+ *                 // Optional docker arguments, such as for setting env vars.
+ *                 options: ['-e', 'SOME_ENV=value'],
+ *                 // The command to run within the container, including any arguments.
+ *                 command: ['bin/tool', '--dry-run', '-'],
+ *                 // How/when the image should be pulled: 'never', 'always' or 'missing'.
+ *                 pullMode: 'always',
+ *                 // A codec for handling interpolations; depends on the content being formatted.
+ *                 interpolationCodec: new PlainStringCodec(),
+ *                 // A normalizer for handling end-of-line characters.
+ *                 lineEndingNormalizer: null,
+ *             )
+ *         ]),
+ *     ]);
  * ```
  *
  * @phpstan-type TDockerImageDetails array{platform: string, digest: string}

@@ -147,13 +147,14 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 use uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
+use uuf6429\PhpCsFixerBlockstringTests\Fixtures;
 
 return (new PhpCsFixer\Config())
 	->registerCustomFixers([new BlockStringFixer()])
 	->setRiskyAllowed(true)
 	->setRules([
-		BlockStringFixer::NAME => [
-			'formatters' => [
+		BlockStringFixer::NAME => BlockStringFixer::config(
+			[
 
 				// 1️⃣ SimpleLineFormatter
 				// Normalizes indentation of any block not explicitly configured below
@@ -175,46 +176,7 @@ return (new PhpCsFixer\Config())
 				// 1. A custom formatter that sorts object keys.
 				// 2. A docker-based formatter that runs the json through jq.
 				'JSON' => new Formatter\ChainFormatter(
-					new class extends Formatter\AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('ObjectKeySorter v1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
-						}
-
-						public function formatContent(string $original): string
-						{
-							return json_encode(
-								$this->sortObjectKeysRecursively(
-									json_decode(
-										$original,
-										false,
-										512,
-										JSON_THROW_ON_ERROR
-									)
-								),
-								JSON_THROW_ON_ERROR
-							);
-						}
-
-						/**
-						 * @param mixed $value
-						 * @return mixed
-						 */
-						private function sortObjectKeysRecursively($value)
-						{
-							if (is_object($value)) {
-								$value = get_object_vars($value);
-								ksort($value);
-								return (object)$value;
-							}
-
-							if (is_array($value)) {
-								return array_map([$this, 'sortObjectKeysRecursively'], $value);
-							}
-
-							return $value;
-						}
-					},
+					new Fixtures\Formatters\JsonObjectKeySorter(),
 					new Formatter\DockerPipeFormatter(
 						'ghcr.io/jqlang/jq',                               // image
 						[],                                                // options
@@ -224,8 +186,8 @@ return (new PhpCsFixer\Config())
 					),
 				),
 
-			],
-		],
+			]
+		),
 	]);
 
 ```
@@ -340,27 +302,28 @@ Example with your own custom class:
 ```php
 final class MyFormatter extends AbstractStringFormatter
 {
+    public function __construct()
+    {
+        // It is required to pass a value to the parent constructor as a first argument. This value is used to
+        // invalidate the cache when your formatter logic is changed (e.g. versioning) or its settings change.
+        // The bare minimum is to pass the class name, but you can also pass a more complex value (e.g. an array
+        // of settings). Avoid passing objects though, especially non-serializable ones.
+        parent::__construct(self::class);
+    }
+
     protected function formatContent(string $original): string
     {
         return 'new content';
     }
 }
 
-['formatters' => [ new MyFormatter('1.0') ]]
-```
-
-Example with an anonymous class:
-
-```php
-['formatters' => [
-    new class ('1.0') extends AbstractStringFormatter
-    {
-        protected function formatContent(string $original): string
-        {
-            return 'new content';
-        }
-    }
-]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => BlockStringFixer::config([
+            'TEXT' => new MyFormatter(),
+        ]),
+    ]);
 ```
 
 ### [ChainFormatter](./src/Formatter/ChainFormatter.php)
@@ -370,11 +333,17 @@ input of the next one.
 
 Example:
 
- ```php
- ['formatters' => [ new ChainFormatter(
-     new FirstFormatter(),
-     new SecondFormatter(),
- ) ]]
+```php
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => BlockStringFixer::config([
+            'JSON' => new ChainFormatter(
+                new FirstFormatter(),
+                new SecondFormatter(),
+            ),
+        ]),
+    ]);
  ```
 
 ### [CliPipeFormatter](./src/Formatter/CliPipeFormatter.php)
@@ -385,12 +354,22 @@ to such external executables.
 Example:
 
 ```php
-['formatters' => [ new CliPipeFormatter(
-    versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
-    formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => BlockStringFixer::config([
+            'J' => new CliPipeFormatter(
+                // Either a version as a string, or the command to get the version (as an array).
+                versionValueOrCommand: '1.0',
+                // An array defining the external command to do the formatting.
+                formatCommand: ['cmd' => 'jfmt -'],
+                // A codec for handling placeholers in template strings; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null
+            )
+        ]),
+    ]);
 ```
 
 The command definition (for version detection or formatting) is an array with the following structure:
@@ -407,14 +386,26 @@ tools. This formatter exists to take advantage of that.
 Example:
 
 ```php
-['formatters' => [ new DockerPipeFormatter(
-    image: 'ghcr.io/jqlang/jq',                 // The docker image; might contain url, tag or even the digest.
-    options: ['-e', 'SOME_ENV=value'],          // Optional docker arguments, such as for setting env vars.
-    command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
-    pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => BlockStringFixer::config([
+            'JSON' => new DockerPipeFormatter(
+                // The docker image; might contain url, tag or even the digest.
+                image: 'ghcr.io/jqlang/jq',
+                // Optional docker arguments, such as for setting env vars.
+                options: ['-e', 'SOME_ENV=value'],
+                // The command to run within the container, including any arguments.
+                command: ['bin/tool', '--dry-run', '-'],
+                // How/when the image should be pulled: 'never', 'always' or 'missing'.
+                pullMode: 'always',
+                // A codec for handling interpolations; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null,
+            )
+        ]),
+    ]);
 ```
 
 ### [SimpleLineFormatter](./src/Formatter/SimpleLineFormatter.php)
@@ -424,12 +415,22 @@ A formatter that normalizes indentation and removes any trailing whitespace at t
 Example:
 
 ```php
-['formatters' => [ new SimpleLineFormatter(
-    indentSize: 4,                              // The number of spaces defining one indentation level in your project.
-    indentChar: "\t",                           // The actual character used for indentation (space or tab).
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => BlockStringFixer::config([
+            'TEXT' => new SimpleLineFormatter(
+                // The number of spaces defining one indentation level in your project.
+                indentSize: 4,
+                // The actual character used for indentation (space or tab).
+                indentChar: "\t",
+                // A codec for handling interpolations; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null,
+            )
+        ]),
+    ]);
 ```
 
 ### [WslPipeFormatter](./src/Formatter/WslPipeFormatter.php)

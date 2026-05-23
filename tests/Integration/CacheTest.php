@@ -27,14 +27,14 @@ final class CacheTest extends TestCase
 		self::$cacheFile = self::$workspace . '/cache.json';
 
 		mkdir(self::$workspace);
-		copy(__DIR__ . '/../fixtures/simple-input.php', self::$inputFile);
+		copy(__DIR__ . '/../Fixtures/Scenarios/caching/input.php', self::$inputFile);
 	}
 
 	public static function tearDownAfterClass(): void
 	{
-		@unlink(self::$inputFile);
-		@unlink(self::$cacheFile);
-		@rmdir(self::$workspace);
+		unlink(self::$inputFile);
+		unlink(self::$cacheFile);
+		rmdir(self::$workspace);
 	}
 
 	/**
@@ -58,7 +58,7 @@ final class CacheTest extends TestCase
 				PHP_BINARY,
 				self::PCF_BINARY_PATH,
 				'fix',
-				'--config=' . __DIR__ . "/../fixtures/simple-config-{$formatterVersion}.php",
+				'--config=' . __DIR__ . "/../Fixtures/Scenarios/caching/config-{$formatterVersion}.php",
 				'--cache-file=' . self::$cacheFile,
 				'--allow-unsupported-php-version=yes',
 				'--show-progress=none',
@@ -73,12 +73,11 @@ final class CacheTest extends TestCase
 		);
 
 		$process->mustRun();
-
 		$output = $process->getErrorOutput() . $process->getOutput();
 
 		$this->assertSame($expectedCacheFileExistence, $cacheFileExistence);
-		$this->assertFileEquals(__DIR__ . "/../fixtures/simple-output-{$formatterVersion}.php", self::$inputFile);
+		$this->assertFileEquals(__DIR__ . "/../Fixtures/Scenarios/caching/output-{$formatterVersion}.php", self::$inputFile);
 		$this->assertStringContainsString($expectedProcessOutput, $output);
-		$this->assertJsonFileWithinJsonFile(__DIR__ . "/../fixtures/simple-cache-{$formatterVersion}.json", self::$cacheFile);
+		$this->assertJsonFileWithinJsonFile(__DIR__ . "/../Fixtures/Scenarios/caching/cache-{$formatterVersion}.json", self::$cacheFile);
 	}
 }
