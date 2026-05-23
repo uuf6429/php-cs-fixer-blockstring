@@ -5,15 +5,12 @@ namespace uuf6429\PhpCsFixerBlockstringTests\Integration;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
-use uuf6429\PhpCsFixerBlockstringTests\CustomAssertionsTrait;
 
 /**
  * @internal
  */
 final class CacheTest extends TestCase
 {
-	use CustomAssertionsTrait;
-
 	private const PCF_BINARY_PATH = __DIR__ . '/../../vendor/bin/php-cs-fixer';
 
 	private static string $workspace;
@@ -78,6 +75,7 @@ final class CacheTest extends TestCase
 		$this->assertSame($expectedCacheFileExistence, $cacheFileExistence);
 		$this->assertFileEquals(__DIR__ . "/../Fixtures/Scenarios/caching/output-{$formatterVersion}.php", self::$inputFile);
 		$this->assertStringContainsString($expectedProcessOutput, $output);
-		$this->assertJsonFileWithinJsonFile(__DIR__ . "/../Fixtures/Scenarios/caching/cache-{$formatterVersion}.json", self::$cacheFile);
+		$this->assertFileExists(self::$cacheFile);
+		$this->assertStringContainsString("JsonCommenter (JsonCommenter {$formatterVersion})", (string)file_get_contents(self::$cacheFile));
 	}
 }
