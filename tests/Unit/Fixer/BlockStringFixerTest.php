@@ -39,13 +39,11 @@ final class BlockStringFixerTest extends TestCase
 		(new BlockStringFixer())->getDefinition();
 	}
 
-	public function testConfigurationIsRequired(): void
+	public function testGetConfigurationDefinition(): void
 	{
-		$this->expectExceptionObject(
-			new InvalidArgumentException('Configuration for fixer Uuf6429/block_string is required.')
-		);
+		$this->expectNotToPerformAssertions();
 
-		(new BlockStringFixer())->fix(new SplFileInfo('test.php'), new Tokens());
+		(new BlockStringFixer())->getConfigurationDefinition();
 	}
 
 	/**
@@ -72,13 +70,13 @@ final class BlockStringFixerTest extends TestCase
 		yield 'nowdoc with unregistered delimiter should be left unchanged' => [
 			'config' => ['formatters' => []],
 			'input' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					<h1>Hello world!</h1>
 					HTML;
 				PHP,
 			'expected' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					<h1>Hello world!</h1>
 					HTML;
@@ -102,7 +100,7 @@ final class BlockStringFixerTest extends TestCase
 				],
 			],
 			'input' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					<h1>Hello world1</h1>
 					HTML;
@@ -114,7 +112,7 @@ final class BlockStringFixerTest extends TestCase
 					XML;
 				PHP,
 			'expected' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					Hello world1
 					HTML;
@@ -155,7 +153,7 @@ final class BlockStringFixerTest extends TestCase
 				],
 			],
 			'input' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					Hello world
 					HTML;
@@ -164,7 +162,7 @@ final class BlockStringFixerTest extends TestCase
 					XML;
 				PHP,
 			'expected' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<'HTML'
 					<htm>Hello world</htm>
 					HTML;
@@ -191,13 +189,13 @@ final class BlockStringFixerTest extends TestCase
 				],
 			],
 			'input' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<"HTML"
 					<h1 class="{$e['class']}">Hello $planet!</h1>
 					HTML;
 				PHP,
 			'expected' => <<<'PHP'
-				<?php
+				<?php declare(strict_types=1);
 				echo <<<"HTML"
 					Hello $planet!
 					HTML;

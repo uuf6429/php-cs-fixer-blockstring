@@ -12,12 +12,22 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * Example:
  *
  * ```php
- * ['formatters' => [ new SimpleLineFormatter(
- *     indentSize: 4,                              // The number of spaces defining one indentation level in your project.
- *     indentChar: "\t",                           // The actual character used for indentation (space or tab).
- *     interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
- *     lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
- * ) ]]
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => [
+ *             'TEXT' => new SimpleLineFormatter(
+ *                 // The number of spaces defining one indentation level in your project.
+ *                 indentSize: 4,
+ *                 // The actual character used for indentation (space or tab).
+ *                 indentChar: "\t",
+ *                 // A codec for handling interpolations; depends on the content being formatted.
+ *                 interpolationCodec: new PlainStringCodec(),
+ *                 // A normalizer for handling end-of-line characters.
+ *                 lineEndingNormalizer: null,
+ *             )
+ *         ],
+ *     ]);
  * ```
  */
 class SimpleLineFormatter extends AbstractStringFormatter

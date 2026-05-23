@@ -10,7 +10,7 @@
 This project extends [PHP-CS-Fixer] to be able to format the contents of PHP [Heredoc] and [Nowdoc] strings (aka
 _Block Strings_).
 
-Note that **no language-specific formatters** are provided by design - this project instead provides the capability to
+Note that **no language-specific formatters** are provided by design – this project instead provides the ability to
 integrate any type of formatters with minimal code (mainly in your PHP-CS-Fixer configuration file).
 
 While this might sound like a weakness, it in fact makes it possible to integrate virtually any formatter for any
@@ -27,7 +27,7 @@ composer require uuf6429/php-cs-fixer-blockstring --dev
 Finally, register a custom fixer in your `.php-cs-fixer.php` config file (1️⃣) and then set up formatters (2️⃣):
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use PhpCsFixer;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
@@ -52,7 +52,7 @@ return (new PhpCsFixer\Config())
 ## 💡 Before You Start
 
 <details>
-<summary>1. How does the configuration look like?</summary>
+<summary>1. What does the configuration look like?</summary>
 
 The configuration is made up of a map of block string delimiters and formatter pairs. A default formatter can be
 configured to run for any Block Strings that have other not been configured.
@@ -77,7 +77,7 @@ handled exclusively by the `JsonFormatter` one.
 
 You might have noticed that the base formatter class requires having a version. Most formatters require a way for
 providing such a version. The reason is that by supplying an up-to-date version, the PHP-CS-Fixer cache can be
-skipped - which is important if the recently-updated external fixer is behaving differently - otherwise fixes become
+skipped - which is important if the recently updated external fixer is behaving differently - otherwise fixes become
 outdated because of an outdated cache. Note that the actual value of the version does not matter. Some formatters
 might be able to figure out the version by themselves.
 </details>
@@ -86,9 +86,9 @@ might be able to figure out the version by themselves.
 <summary>3. What about variable interpolation in Heredoc?</summary>
 
 They provide an interesting challenge, which this project solves with the concept of an [`InterpolationCodec`].
-It works by replacing interpolation 'segments' with tokens - ensuring that the content is valid during the
-formatting stage - and then they're rolled back to the original value.
-The codec can be configured for most of the formatters - you should probably apply such configuration diligently if
+It works by replacing interpolation 'segments' with tokens – ensuring that the content is valid during the
+formatting stage – and then they're rolled back to the original value.
+The codec can be configured for most of the formatters – you should probably apply such configuration diligently if
 you plan on having Heredoc strings.
 
 Here's an example illustration of the whole flow:
@@ -101,7 +101,7 @@ echo <<<JSON
 
 That JSON cannot be formatted properly because `$users` is not valid syntax. The [`GeneratedTokenCodec`] codec can be
 used; it will automatically replace the `$users` part with a token temporarily. By default, it will replace it with
-`__PHP_VAR_1__` in this specific case - which, however, is still not valid(!) So instead, we configure it with a
+`__PHP_VAR_1__` in this specific case – which, however, is still not valid(!) So instead, we configure it with a
 different token pattern: `new GeneratedTokenCodec('"__PHP_VAR_%d__"')`. The double quotes ensure that the replaced
 token is valid JSON:
 
@@ -122,13 +122,13 @@ The `GeneratedTokenCodec` codec additionally allows handling interpolations on a
 callback that acts as a token generation factory. If this callback returns null instead of a string token, the default
 functionality will be used instead.
 
-Additionally, you can always build your own codec - you just need to implement [`CodecInterface`].
+Additionally, you can always build your own codec simply by having a class implement [`CodecInterface`].
 </details>
 
 <details>
 <summary>5. The 3d-party/external formatter complains that the string has bad syntax.</summary>
 
-This is not at all unlikely - that's one reason why the interpolation codec concept exists - string interpolation often
+This is not at all unlikely – that's one reason why the interpolation codec concept exists – string interpolation often
 causes broken syntax. Unfortunately, the codec concept won't help you if you're using some other sort of templating
 system, such as replacing placeholders with `str_replace()`, `preg_replace()`, `strtr()` or `sprintf()` or similar.
 You can, however, implement a "formatter" that replaces such placeholders temporarily during formatting and then
@@ -317,7 +317,7 @@ JS;
 ### [AbstractFormatter](./src/Formatter/AbstractFormatter.php)
 
 This is the base class of all formatters. In most cases you don't really want to extend this class, since it does
-not handle string interpolation at all - check out [`AbstractStringFormatter`] instead.
+not handle string interpolation at all – check out [`AbstractStringFormatter`] instead.
 
 Extending this class makes sense in two situations:
 
@@ -332,7 +332,7 @@ _Deprecated in favour of [`AbstractStringFormatter`]._
 
 ### [AbstractStringFormatter](./src/Formatter/AbstractStringFormatter.php)
 
-This formatter base class is aware of string interpolation - it passes content through a codec before and after
+This formatter base class is aware of string interpolation – it passes content through a codec before and after
 formatting (to properly handle string interpolation).
 
 Additionally, it keeps an in-memory cache of formatted content to avoid unnecessary work within the same process.
@@ -344,42 +344,49 @@ Example with your own custom class:
 ```php
 final class MyFormatter extends AbstractStringFormatter
 {
+    public function __construct()
+    {
+        // It is required to pass a value to the parent constructor as a first argument. This value is used to
+        // invalidate the cache when your formatter logic is changed (e.g. versioning) or its settings change.
+        // The bare minimum is to pass the class name, but you can also pass a more complex value (e.g. an array
+        // of settings). Avoid passing objects though, especially non-serializable ones.
+        parent::__construct(self::class);
+    }
+
     protected function formatContent(string $original): string
     {
         return 'new content';
     }
 }
 
-['formatters' => [ new MyFormatter('1.0') ]]
-```
-
-Example with an anonymous class:
-
-```php
-['formatters' => [
-    new class ('1.0') extends AbstractStringFormatter
-    {
-        protected function formatContent(string $original): string
-        {
-            return 'new content';
-        }
-    }
-]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => [
+            'TEXT' => new MyFormatter(),
+        ],
+    ]);
 ```
 
 ### [ChainFormatter](./src/Formatter/ChainFormatter.php)
 
-This formatter allows multiple formatters to be applied sequentially - the output of each formatter becomes the
+This formatter allows multiple formatters to be applied sequentially – the output of each formatter becomes the
 input of the next one.
 
 Example:
 
- ```php
- ['formatters' => [ new ChainFormatter(
-     new FirstFormatter(),
-     new SecondFormatter(),
- ) ]]
- ```
+```php
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => [
+            'JSON' => new ChainFormatter(
+                new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
+                new SimpleLineFormatter(4, "\t"),
+            ),
+        ],
+    ]);
+```
 
 ### [CliPipeFormatter](./src/Formatter/CliPipeFormatter.php)
 
@@ -389,36 +396,58 @@ to such external executables.
 Example:
 
 ```php
-['formatters' => [ new CliPipeFormatter(
-    versionValueOrCommand: '1.0',               // Either a version as a string, or the command to get the version (as an array).
-    formatCommand: ['cmd' => 'jfmt -'],         // An array defining the external command to do the formatting.
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => [
+            'J' => new CliPipeFormatter(
+                // Either a version as a string, or the command to get the version (as an array).
+                versionValueOrCommand: '1.0',
+                // An array defining the external command to do the formatting.
+                formatCommand: ['cmd' => 'jfmt -'],
+                // A codec for handling placeholers in template strings; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null
+            )
+        ],
+    ]);
 ```
 
 The command definition (for version detection or formatting) is an array with the following structure:
 
-- `cmd` - array/string - The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
-- `cwd` - (optional) string - The current working directory of the command.
-- `env` - (optional) array of string keys and values - Environment variables to pass to the command.
+- `cmd` `array`/`string`: The command line e.g. `'jfmt --format'` or `['jfmt', '--format']`.
+- `cwd` (optional) `string`: The current working directory of the command.
+- `env` (optional) `array` of `string` keys and values: Environment variables to pass to the command.
 
 ### [DockerPipeFormatter](./src/Formatter/DockerPipeFormatter.php)
 
-The minimal setup, stable repeatability, and a rich ecosystem makes Docker images an ideal source of formatting
+The minimal setup, stable repeatability, and a rich ecosystem make Docker images an ideal source of formatting
 tools. This formatter exists to take advantage of that.
 
 Example:
 
 ```php
-['formatters' => [ new DockerPipeFormatter(
-    image: 'ghcr.io/jqlang/jq',                 // The docker image; might contain url, tag or even the digest.
-    options: ['-e', 'SOME_ENV=value'],          // Optional docker arguments, such as for setting env vars.
-    command: ['bin/tool', '--dry-run', '-'],    // The command to run within the container, including any arguments.
-    pullMode: 'always',                         // How/when the image should be pulled: 'never', 'always' or 'missing'.
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => [
+            'JSON' => new DockerPipeFormatter(
+                // The docker image; might contain url, tag or even the digest.
+                image: 'ghcr.io/jqlang/jq',
+                // Optional docker arguments, such as for setting env vars.
+                options: ['-e', 'SOME_ENV=value'],
+                // The command to run within the container, including any arguments.
+                command: ['bin/tool', '--dry-run', '-'],
+                // How/when the image should be pulled: 'never', 'always' or 'missing'.
+                pullMode: 'always',
+                // A codec for handling interpolations; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null,
+            )
+        ],
+    ]);
 ```
 
 ### [SimpleLineFormatter](./src/Formatter/SimpleLineFormatter.php)
@@ -428,18 +457,28 @@ A formatter that normalizes indentation and removes any trailing whitespace at t
 Example:
 
 ```php
-['formatters' => [ new SimpleLineFormatter(
-    indentSize: 4,                              // The number of spaces defining one indentation level in your project.
-    indentChar: "\t",                           // The actual character used for indentation (space or tab).
-    interpolationCodec: new PlainStringCodec(), // A codec for handling interpolations; depends on the content being formatted.
-    lineEndingNormalizer: null,                 // A normalizer for handling end-of-line characters.
-) ]]
+return (new PhpCsFixer\Config())
+    ->registerCustomFixers([new BlockStringFixer()])
+    ->setRules([
+        BlockStringFixer::NAME => [
+            'TEXT' => new SimpleLineFormatter(
+                // The number of spaces defining one indentation level in your project.
+                indentSize: 4,
+                // The actual character used for indentation (space or tab).
+                indentChar: "\t",
+                // A codec for handling interpolations; depends on the content being formatted.
+                interpolationCodec: new PlainStringCodec(),
+                // A normalizer for handling end-of-line characters.
+                lineEndingNormalizer: null,
+            )
+        ],
+    ]);
 ```
 
 ### [WslPipeFormatter](./src/Formatter/WslPipeFormatter.php)
 
-A formatter making use of Windows Subsystem for Linux (WSL). Of course you will need to be running on Windows and WSL
-needs to be enabled and set up. Configuration is otherwise almost identical to [`CliPipeFormatter`].
+A formatter making use of Windows Subsystem for Linux (WSL). Of course, you will need to be running on Windows,
+and WSL needs to be enabled and set up. Configuration is otherwise almost identical to [`CliPipeFormatter`].
 
 [PHP-CS-Fixer]: https://github.com/PHP-CS-Fixer/PHP-CS-Fixer
 
