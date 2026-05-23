@@ -147,6 +147,7 @@ reverses them back, but since this seems like an uncommon usecase, there aren't 
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 use uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
+use uuf6429\PhpCsFixerBlockstringTests\Fixtures;
 
 return (new PhpCsFixer\Config())
 	->registerCustomFixers([new BlockStringFixer()])
@@ -175,46 +176,7 @@ return (new PhpCsFixer\Config())
 				// 1. A custom formatter that sorts object keys.
 				// 2. A docker-based formatter that runs the json through jq.
 				'JSON' => new Formatter\ChainFormatter(
-					new class extends Formatter\AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('1.0', new GeneratedTokenCodec('"__PHP_VAR_%d__"'));
-						}
-
-						public function formatContent(string $original): string
-						{
-							return json_encode(
-								$this->sortObjectKeysRecursively(
-									json_decode(
-										$original,
-										false,
-										512,
-										JSON_THROW_ON_ERROR
-									)
-								),
-								JSON_THROW_ON_ERROR
-							);
-						}
-
-						/**
-						 * @param mixed $value
-						 * @return mixed
-						 */
-						private function sortObjectKeysRecursively($value)
-						{
-							if (is_object($value)) {
-								$value = get_object_vars($value);
-								ksort($value);
-								return (object)$value;
-							}
-
-							if (is_array($value)) {
-								return array_map([$this, 'sortObjectKeysRecursively'], $value);
-							}
-
-							return $value;
-						}
-					},
+					new Fixtures\Formatters\JsonObjectKeySorter(),
 					new Formatter\DockerPipeFormatter(
 						'ghcr.io/jqlang/jq',                               // image
 						[],                                                // options

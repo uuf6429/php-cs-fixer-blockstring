@@ -9,6 +9,6 @@ parameters:
 		- ./tests
 		- ./bootstrap.php
 	excludePaths:
-		- ./tests/fixtures/*
+		- ./tests/Fixtures/Scenarios/*
 	ignoreErrors:
 		- '#Dynamic call to static method PHPUnit\\Framework\\.*#'

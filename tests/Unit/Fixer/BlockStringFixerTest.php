@@ -2,13 +2,12 @@
 
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\Fixer;
 
-use InvalidArgumentException;
 use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
-use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractStringFormatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\GeneratedTokenCodec;
+use uuf6429\PhpCsFixerBlockstringTests\Fixtures;
 
 /**
  * @internal
@@ -86,17 +85,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'nowdoc/heredoc html should have tags stripped out' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('1');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(null),
 				],
 			],
 			'input' => <<<'PHP'
@@ -128,28 +117,8 @@ final class BlockStringFixerTest extends TestCase
 		yield 'default formatter should apply to everything except other matching formatters' => [
 			'config' => [
 				'formatters' => [
-					new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('2');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return "<def>$original</def>";
-						}
-					},
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('3');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return "<htm>$original</htm>";
-						}
-					},
+					new fixtures\Formatters\TagWrapper('def'),
+					'HTML' => new fixtures\Formatters\TagWrapper('htm'),
 				],
 			],
 			'input' => <<<'PHP'
@@ -175,17 +144,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'heredoc with with a few variables' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('4', new GeneratedTokenCodec());
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(new GeneratedTokenCodec()),
 				],
 			],
 			'input' => <<<'PHP'
@@ -205,17 +164,7 @@ final class BlockStringFixerTest extends TestCase
 		yield 'Windows-style newlines' => [
 			'config' => [
 				'formatters' => [
-					'HTML' => new class extends AbstractStringFormatter {
-						public function __construct()
-						{
-							parent::__construct('5');
-						}
-
-						protected function formatContent(string $original): string
-						{
-							return strip_tags($original);
-						}
-					},
+					'HTML' => new fixtures\Formatters\HtmlTagStripper(null),
 				],
 			],
 			'input' => "<?php\r\n\r\necho <<<'HTML'\r\n    <h1>Hello world!</h1>\r\n    HTML;\r\n",
