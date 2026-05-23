@@ -5,17 +5,23 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 
 /**
- * This formatter allows multiple formatters to be applied sequentially - the output of each formatter becomes the
+ * This formatter allows multiple formatters to be applied sequentially – the output of each formatter becomes the
  * input of the next one.
  *
  * Example:
  *
- *  ```php
- *  ['formatters' => [ new ChainFormatter(
- *      new FirstFormatter(),
- *      new SecondFormatter(),
- *  ) ]]
- *  ```
+ * ```php
+ * return (new PhpCsFixer\Config())
+ *     ->registerCustomFixers([new BlockStringFixer()])
+ *     ->setRules([
+ *         BlockStringFixer::NAME => [
+ *             'JSON' => new ChainFormatter(
+ *                 new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
+ *                 new SimpleLineFormatter(4, "\t"),
+ *             ),
+ *         ],
+ *     ]);
+ * ```
  */
 final class ChainFormatter extends AbstractFormatter
 {

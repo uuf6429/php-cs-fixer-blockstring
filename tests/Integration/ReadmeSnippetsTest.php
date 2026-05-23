@@ -3,6 +3,7 @@
 namespace uuf6429\PhpCsFixerBlockstringTests\Integration;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * @internal
@@ -32,11 +33,13 @@ final class ReadmeSnippetsTest extends TestCase
 	public function testSnippet(string $snippet): void
 	{
 		$snippet = <<<"PHP"
+			use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractStringFormatter;
+			use uuf6429\PhpCsFixerBlockstring\Formatter\ChainFormatter;
+			use uuf6429\PhpCsFixerBlockstring\Formatter\CliPipeFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\DockerPipeFormatter;
 			use uuf6429\PhpCsFixerBlockstring\Formatter\SimpleLineFormatter;
-			use uuf6429\PhpCsFixerBlockstring\Formatter\CliPipeFormatter;
 			use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\PlainStringCodec;
 			
 			$snippet;
@@ -54,7 +57,7 @@ final class ReadmeSnippetsTest extends TestCase
 	{
 		$content = file_get_contents(self::README_FILE);
 		if ($content === false) {
-			throw new \RuntimeException('File could not be read: ' . self::README_FILE);
+			throw new RuntimeException('File could not be read: ' . self::README_FILE);
 		}
 		$content = explode("\n## ⭐️ Formatters\n", $content, 2);
 

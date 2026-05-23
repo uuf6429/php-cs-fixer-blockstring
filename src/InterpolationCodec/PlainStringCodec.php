@@ -3,7 +3,6 @@
 namespace uuf6429\PhpCsFixerBlockstring\InterpolationCodec;
 
 use RuntimeException;
-use uuf6429\PhpCsFixerBlockstring\BlockString\InterpolationSegment;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
 
 final class PlainStringCodec implements CodecInterface
