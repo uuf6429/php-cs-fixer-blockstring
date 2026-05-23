@@ -17,9 +17,11 @@ use uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter;
 use const T_START_HEREDOC;
 
 /**
- * @phpstan-type TFormatterConfig array{formatters: array<0|non-empty-string, AbstractFormatter>}
+ * @phpstan-type TFormatters array<0|non-empty-string, AbstractFormatter>
+ * @phpstan-type TDeserilizedConfig array{formatters: TFormatters}
+ * @phpstan-type TSerializedConfig array{formatters: string}
  *
- * @implements ConfigurableFixerInterface<TFormatterConfig, TFormatterConfig>
+ * @implements ConfigurableFixerInterface<TSerializedConfig, TDeserilizedConfig>
  */
 final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterface
 {
@@ -28,9 +30,9 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 	private ?FixerConfigurationResolverInterface $configurationDefinition = null;
 
 	/**
-	 * @var null|TFormatterConfig
+	 * @var TDeserilizedConfig
 	 */
-	private ?array $configuration = null;
+	private array $configuration;
 
 	public function isRisky(): bool
 	{
@@ -75,18 +77,26 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 			]);
 	}
 
+	/**
+	 * @param TDeserilizedConfig $configuration
+	 * @return void
+	 */
 	public function configure(array $configuration): void
 	{
-		// @phpstan-ignore assign.propertyType
-		$this->configuration = $this->getConfigurationDefinition()->resolve($configuration);
+		if (isset($configuration['formatters']) && !is_string($configuration['formatters'])) {
+			throw new InvalidArgumentException(
+				'BlockStringFixer configuration is not valid. '
+				. 'Did you set it up in your PHP CS Fixer config with `BlockStringFixer::config()`?'
+			);
+		}
+
+		$this->configuration = [
+			'formatters' => unserialize($configuration['formatters'] ?? 'a:0:{}', ['allowed_classes' => true]),
+		];
 	}
 
 	public function fix(SplFileInfo $file, Tokens $tokens): void
 	{
-		if ($this->configuration === null) {
-			throw new InvalidArgumentException("Configuration for fixer {$this->getName()} is required.");
-		}
-
 		if (0 < $tokens->count() && $this->isCandidate($tokens) && $this->supports($file)) {
 			$blockStringStream = TokenStream::fromPhpCsFixerTokens($tokens);
 			while (($blockString = $blockStringStream->next()) !== null) {
@@ -99,5 +109,16 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 				$blockStringStream->replace($formatter->formatBlock($blockString));
 			}
 		}
+	}
+
+	/**
+	 * @param TFormatters $formatters
+	 * @return TSerializedConfig
+	 */
+	public static function config(array $formatters): array
+	{
+		return [
+			'formatters' => serialize($formatters),
+		];
 	}
 }

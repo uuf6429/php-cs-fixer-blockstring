@@ -38,15 +38,15 @@ final class CacheTest extends TestCase
 	}
 
 	/**
-	 * @testWith ["Test v1", "Fixed 1 of 1 files", "Cache file did not exist"]
-	 *           ["Test v1", "Fixed 0 of 1 files", "Cache file existed already"]
-	 *           ["Test v2", "Fixed 1 of 1 files", "Cache file existed already"]
-	 *           ["Test v2", "Fixed 0 of 1 files", "Cache file existed already"]
+	 * @testWith ["v1", "Fixed 1 of 1 files", "Cache file did not exist"]
+	 *           ["v1", "Fixed 0 of 1 files", "Cache file existed already"]
+	 *           ["v2", "Fixed 1 of 1 files", "Cache file existed already"]
+	 *           ["v2", "Fixed 0 of 1 files", "Cache file existed already"]
 	 *
 	 * @throws JsonException
 	 */
 	public function testCacheReuse(
-		string $cacheFingerprint,
+		string $formatterVersion,
 		string $expectedProcessOutput,
 		string $expectedCacheFileExistence
 	): void {
@@ -55,10 +55,10 @@ final class CacheTest extends TestCase
 			: 'Cache file did not exist';
 		$process = new Process(
 			[
-				'php',
+				PHP_BINARY,
 				self::PCF_BINARY_PATH,
 				'fix',
-				'--config=' . __DIR__ . '/../fixtures/simple-config.php',
+				'--config=' . __DIR__ . "/../fixtures/simple-config-{$formatterVersion}.php",
 				'--cache-file=' . self::$cacheFile,
 				'--allow-unsupported-php-version=yes',
 				'--show-progress=none',
@@ -66,8 +66,10 @@ final class CacheTest extends TestCase
 				'-vvv',
 				self::$inputFile,
 			],
-			null,
-			['TEST_FORMATTER_CACHE_FINGERPRINT' => $cacheFingerprint]
+			self::$workspace,
+			[
+				'PHP_CS_FIXER_ALLOW_XDEBUG' => 1,
+			]
 		);
 
 		$process->mustRun();
@@ -75,12 +77,8 @@ final class CacheTest extends TestCase
 		$output = $process->getErrorOutput() . $process->getOutput();
 
 		$this->assertSame($expectedCacheFileExistence, $cacheFileExistence);
-		$this->assertFileEquals(__DIR__ . '/../fixtures/simple-output.php', self::$inputFile);
+		$this->assertFileEquals(__DIR__ . "/../fixtures/simple-output-{$formatterVersion}.php", self::$inputFile);
 		$this->assertStringContainsString($expectedProcessOutput, $output);
-		$this->assertJsonFileWithinJsonFile(
-			__DIR__ . '/../fixtures/simple-cache.json',
-			self::$cacheFile,
-			['TEST_FORMATTER_CACHE_FINGERPRINT' => $cacheFingerprint]
-		);
+		$this->assertJsonFileWithinJsonFile(__DIR__ . "/../fixtures/simple-cache-{$formatterVersion}.json", self::$cacheFile);
 	}
 }

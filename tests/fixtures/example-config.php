@@ -8,8 +8,8 @@ return (new PhpCsFixer\Config())
 	->registerCustomFixers([new BlockStringFixer()])
 	->setRiskyAllowed(true)
 	->setRules([
-		BlockStringFixer::NAME => [
-			'formatters' => [
+		BlockStringFixer::NAME => BlockStringFixer::config(
+			[
 
 				// 1️⃣ SimpleLineFormatter
 				// Normalizes indentation of any block not explicitly configured below
@@ -80,6 +80,6 @@ return (new PhpCsFixer\Config())
 					),
 				),
 
-			],
-		],
+			]
+		),
 	]);

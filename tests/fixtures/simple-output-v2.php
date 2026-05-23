@@ -2,6 +2,7 @@
 
 echo <<<'JSON'
 	{
+	    "_comment": "JsonFormatterV2",
 	    "users": [],
 	    "ascending": false
 	}
