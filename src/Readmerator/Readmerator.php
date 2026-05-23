@@ -19,16 +19,16 @@ final class Readmerator
 			self::readFile(self::README_TEMPLATE),
 			[
 				'{{PROJECT_NAME}}' => 'uuf6429/php-cs-fixer-blockstring',
-				'{{EXAMPLE_CONFIG}}' => file_get_contents("$projectRoot/tests/fixtures/example-config.php"),
+				'{{EXAMPLE_CONFIG}}' => file_get_contents("$projectRoot/tests/Fixtures/Scenarios/example/config.php"),
 				'{{EXAMPLE_INPUT}}' => str_replace(
 					[' ', "\t"],
 					['·', '───→'],
-					self::readFile("$projectRoot/tests/fixtures/example-input.php"),
+					self::readFile("$projectRoot/tests/Fixtures/Scenarios/example/input.php"),
 				),
 				'{{EXAMPLE_OUTPUT}}' => str_replace(
 					[' ', "\t"],
 					['·', '───→'],
-					self::readFile("$projectRoot/tests/fixtures/example-output.php")
+					self::readFile("$projectRoot/tests/Fixtures/Scenarios/example/output.php")
 				),
 				'{{FORMATTERS}}' => rtrim(implode(
 					"\n",
