@@ -153,8 +153,8 @@ return (new PhpCsFixer\Config())
 	->registerCustomFixers([new BlockStringFixer()])
 	->setRiskyAllowed(true)
 	->setRules([
-		BlockStringFixer::NAME => [
-			'formatters' => [
+		BlockStringFixer::NAME => BlockStringFixer::config(
+			[
 
 				// 1️⃣ SimpleLineFormatter
 				// Normalizes indentation of any block not explicitly configured below
@@ -186,8 +186,8 @@ return (new PhpCsFixer\Config())
 					),
 				),
 
-			],
-		],
+			]
+		),
 	]);
 
 ```
@@ -288,10 +288,6 @@ Extending this class makes sense in two situations:
 2. Or if, for whatever reason, the [`CodecInterface`] concept does not work for you and you want to write
    something from scratch.
 
-### [AbstractCodecFormatter](./src/Formatter/AbstractCodecFormatter.php)
-
-_Deprecated in favour of [`AbstractStringFormatter`]._
-
 ### [AbstractStringFormatter](./src/Formatter/AbstractStringFormatter.php)
 
 This formatter base class is aware of string interpolation – it passes content through a codec before and after
@@ -324,9 +320,9 @@ final class MyFormatter extends AbstractStringFormatter
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])
     ->setRules([
-        BlockStringFixer::NAME => [
+        BlockStringFixer::NAME => BlockStringFixer::config([
             'TEXT' => new MyFormatter(),
-        ],
+        ]),
     ]);
 ```
 
@@ -341,12 +337,12 @@ Example:
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])
     ->setRules([
-        BlockStringFixer::NAME => [
+        BlockStringFixer::NAME => BlockStringFixer::config([
             'JSON' => new ChainFormatter(
                 new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
                 new SimpleLineFormatter(4, "\t"),
             ),
-        ],
+        ]),
     ]);
 ```
 
@@ -361,7 +357,7 @@ Example:
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])
     ->setRules([
-        BlockStringFixer::NAME => [
+        BlockStringFixer::NAME => BlockStringFixer::config([
             'J' => new CliPipeFormatter(
                 // Either a version as a string, or the command to get the version (as an array).
                 versionValueOrCommand: '1.0',
@@ -372,7 +368,7 @@ return (new PhpCsFixer\Config())
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null
             )
-        ],
+        ]),
     ]);
 ```
 
@@ -393,7 +389,7 @@ Example:
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])
     ->setRules([
-        BlockStringFixer::NAME => [
+        BlockStringFixer::NAME => BlockStringFixer::config([
             'JSON' => new DockerPipeFormatter(
                 // The docker image; might contain url, tag or even the digest.
                 image: 'ghcr.io/jqlang/jq',
@@ -408,7 +404,7 @@ return (new PhpCsFixer\Config())
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null,
             )
-        ],
+        ]),
     ]);
 ```
 
@@ -422,7 +418,7 @@ Example:
 return (new PhpCsFixer\Config())
     ->registerCustomFixers([new BlockStringFixer()])
     ->setRules([
-        BlockStringFixer::NAME => [
+        BlockStringFixer::NAME => BlockStringFixer::config([
             'TEXT' => new SimpleLineFormatter(
                 // The number of spaces defining one indentation level in your project.
                 indentSize: 4,
@@ -433,7 +429,7 @@ return (new PhpCsFixer\Config())
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null,
             )
-        ],
+        ]),
     ]);
 ```
 

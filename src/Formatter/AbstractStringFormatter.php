@@ -39,9 +39,9 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * return (new PhpCsFixer\Config())
  *     ->registerCustomFixers([new BlockStringFixer()])
  *     ->setRules([
- *         BlockStringFixer::NAME => [
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'TEXT' => new MyFormatter(),
- *         ],
+ *         ]),
  *     ]);
  * ```
  */
@@ -66,16 +66,23 @@ abstract class AbstractStringFormatter extends AbstractFormatter
 	 */
 	private NormalizerInterface $lineEndingNormalizer;
 
+	/**
+	 * @param mixed $cacheFingerprint {@see AbstractFormatter::__construct()}
+	 */
 	public function __construct(
-		string               $version,
-		?CodecInterface      $interpolationCodec=null,
-		?NormalizerInterface $lineEndingNormalizer=null
+		$cacheFingerprint,
+		?CodecInterface $interpolationCodec = null,
+		?NormalizerInterface $lineEndingNormalizer = null
 	) {
-		parent::__construct($version);
-
 		$this->objectIndex = self::$objectCounter++;
 		$this->interpolationCodec = $interpolationCodec ?? new PlainStringCodec();
 		$this->lineEndingNormalizer = $lineEndingNormalizer ?? new DefaultNormalizer(DefaultNormalizer::NO_CHANGE, DefaultNormalizer::NO_CHANGE);
+
+		parent::__construct([
+			$cacheFingerprint,
+			$this->interpolationCodec->getCacheFingerprint(),
+			$this->lineEndingNormalizer->getCacheFingerprint(),
+		]);
 	}
 
 	final public function formatBlock(BlockString $blockString): BlockString

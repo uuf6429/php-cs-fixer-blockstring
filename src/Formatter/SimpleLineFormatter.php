@@ -15,7 +15,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * return (new PhpCsFixer\Config())
  *     ->registerCustomFixers([new BlockStringFixer()])
  *     ->setRules([
- *         BlockStringFixer::NAME => [
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'TEXT' => new SimpleLineFormatter(
  *                 // The number of spaces defining one indentation level in your project.
  *                 indentSize: 4,
@@ -26,7 +26,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *                 // A normalizer for handling end-of-line characters.
  *                 lineEndingNormalizer: null,
  *             )
- *         ],
+ *         ]),
  *     ]);
  * ```
  */
@@ -71,7 +71,7 @@ class SimpleLineFormatter extends AbstractStringFormatter
 			);
 		}
 
-		parent::__construct('1', $interpolationCodec, $lineEndingNormalizer);
+		parent::__construct(static::class . ' v1', $interpolationCodec, $lineEndingNormalizer);
 	}
 
 	protected function formatContent(string $original): string

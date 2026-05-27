@@ -20,4 +20,9 @@ final class PlainStringCodec implements CodecInterface
 	{
 		return [new StringSegment($result->content)];
 	}
+
+	public function getCacheFingerprint()
+	{
+		return [self::class];
+	}
 }

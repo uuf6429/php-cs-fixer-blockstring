@@ -17,7 +17,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * return (new PhpCsFixer\Config())
  *     ->registerCustomFixers([new BlockStringFixer()])
  *     ->setRules([
- *         BlockStringFixer::NAME => [
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'J' => new CliPipeFormatter(
  *                 // Either a version as a string, or the command to get the version (as an array).
  *                 versionValueOrCommand: '1.0',
@@ -28,7 +28,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *                 // A normalizer for handling end-of-line characters.
  *                 lineEndingNormalizer: null
  *             )
- *         ],
+ *         ]),
  *     ]);
  * ```
  *
@@ -77,9 +77,16 @@ class CliPipeFormatter extends AbstractStringFormatter
 		}
 
 		parent::__construct(
-			is_string($versionValueOrCommand)
-				? $versionValueOrCommand
-				: $this->exec($versionValueOrCommand, null),
+			sprintf(
+				'%s: %s v%s',
+				static::class,
+				is_array($this->formatter['cmd'])
+					? implode(' ', $this->formatter['cmd'])
+					: $this->formatter['cmd'],
+				is_string($versionValueOrCommand)
+					? $versionValueOrCommand
+					: $this->exec($versionValueOrCommand, null)
+			),
 			$interpolationCodec,
 			$lineEndingNormalizer
 		);

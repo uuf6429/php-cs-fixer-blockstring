@@ -14,12 +14,12 @@ use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
  * return (new PhpCsFixer\Config())
  *     ->registerCustomFixers([new BlockStringFixer()])
  *     ->setRules([
- *         BlockStringFixer::NAME => [
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'JSON' => new ChainFormatter(
  *                 new CliPipeFormatter('v1', ['cmd' => 'some-old-tool']),
  *                 new SimpleLineFormatter(4, "\t"),
  *             ),
- *         ],
+ *         ]),
  *     ]);
  * ```
  */
@@ -35,9 +35,12 @@ final class ChainFormatter extends AbstractFormatter
 	 */
 	public function __construct(AbstractFormatter ...$formatters)
 	{
-		parent::__construct('1.0');
-
 		$this->formatters = array_values($formatters);
+
+		parent::__construct([
+			self::class,
+			array_map(static fn(AbstractFormatter $formatter) => $formatter->getCacheFingerprint(), $this->formatters),
+		]);
 	}
 
 	public function formatBlock(BlockString $blockString): BlockString

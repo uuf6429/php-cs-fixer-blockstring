@@ -20,7 +20,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  * return (new PhpCsFixer\Config())
  *     ->registerCustomFixers([new BlockStringFixer()])
  *     ->setRules([
- *         BlockStringFixer::NAME => [
+ *         BlockStringFixer::NAME => BlockStringFixer::config([
  *             'JSON' => new DockerPipeFormatter(
  *                 // The docker image; might contain url, tag or even the digest.
  *                 image: 'ghcr.io/jqlang/jq',
@@ -35,7 +35,7 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *                 // A normalizer for handling end-of-line characters.
  *                 lineEndingNormalizer: null,
  *             )
- *         ],
+ *         ]),
  *     ]);
  * ```
  *
@@ -106,7 +106,18 @@ class DockerPipeFormatter extends AbstractStringFormatter
 		}
 
 		parent::__construct(
-			"{$this->imageDetails['platform']};{$this->imageDetails['digest']}",
+			sprintf(
+				'%s: %s',
+				static::class,
+				implode(
+					' ',
+					array_merge(
+						["{$this->imageDetails['platform']};{$this->imageDetails['digest']}"],
+						$this->options,
+						$this->command
+					)
+				)
+			),
 			$interpolationCodec,
 			$lineEndingNormalizer
 		);
