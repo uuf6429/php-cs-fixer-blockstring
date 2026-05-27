@@ -83,28 +83,26 @@ final class GeneratedTokenCodec implements CodecInterface
 			}
 
 			if ($matchToken !== null) {
-				if ($pos < $matchPos - strlen($matchToken)) {
-					$segments[] = new StringSegment(substr($content, $pos, $matchPos - strlen($matchToken) - $pos));
-				}
 				$segments[] = $result->mapping[$matchToken];
 				$pos = $matchPos;
-			} else {
-				$start = $pos;
-				$pos++;
-				while ($pos < $len) {
-					$node = $root;
-					$cur = $pos;
-					while ($cur < $len && isset($node->children[$content[$cur]])) {
-						$node = $node->children[$content[$cur]];
-						$cur++;
-						if ($node->token !== null) {
-							break 2;
-						}
-					}
-					$pos++;
-				}
-				$segments[] = new StringSegment(substr($content, $start, $pos - $start));
+				continue;
 			}
+
+			$start = $pos;
+			$pos++;
+			while ($pos < $len) {
+				$node = $root;
+				$cur = $pos;
+				while ($cur < $len && isset($node->children[$content[$cur]])) {
+					$node = $node->children[$content[$cur]];
+					$cur++;
+					if ($node->token !== null) {
+						break 2;
+					}
+				}
+				$pos++;
+			}
+			$segments[] = new StringSegment(substr($content, $start, $pos - $start));
 		}
 
 		return $segments;

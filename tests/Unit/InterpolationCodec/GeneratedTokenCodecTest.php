@@ -103,4 +103,138 @@ final class GeneratedTokenCodecTest extends TestCase
 
 		$this->assertSame([GeneratedTokenCodec::class, '<some-pattern>', 'fingerprint'], $codec->getCacheFingerprint());
 	}
+
+	/**
+	 * @dataProvider decodeDataProvider
+	 *
+	 * @param array<string, InterpolationSegment> $mapping
+	 * @param list<StringSegment|InterpolationSegment> $expectedSegments
+	 */
+	public function testDecode(array $mapping, string $content, array $expectedSegments): void
+	{
+		$codec = new GeneratedTokenCodec();
+		$result = new CodecResult($mapping, $content);
+
+		$this->assertEquals($expectedSegments, $codec->decode($result));
+	}
+
+	/**
+	 * @return iterable<string, array{
+	 *     mapping: array<string, InterpolationSegment>,
+	 *     content: string,
+	 *     expectedSegments: list<StringSegment|InterpolationSegment>,
+	 * }>
+	 */
+	public static function decodeDataProvider(): iterable
+	{
+		yield 'empty' => [
+			'mapping' => [],
+			'content' => '',
+			'expectedSegments' => [],
+		];
+
+		yield 'only string' => [
+			'mapping' => [],
+			'content' => 'hello world',
+			'expectedSegments' => [new StringSegment('hello world')],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		yield 'only token' => [
+			'mapping' => ['{T1}' => $s1],
+			'content' => '{T1}',
+			'expectedSegments' => [$s1],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		yield 'token with surrounding text' => [
+			'mapping' => ['{T1}' => $s1],
+			'content' => 'aa{T1}bb',
+			'expectedSegments' => [
+				new StringSegment('aa'),
+				$s1,
+				new StringSegment('bb'),
+			],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		$s2 = new InterpolationSegment([]);
+		yield 'multiple tokens' => [
+			'mapping' => [
+				'{T1}' => $s1,
+				'{T2}' => $s2,
+			],
+			'content' => 'aa{T1}bb{T2}cc',
+			'expectedSegments' => [
+				new StringSegment('aa'),
+				$s1,
+				new StringSegment('bb'),
+				$s2,
+				new StringSegment('cc'),
+			],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		$s2 = new InterpolationSegment([]);
+		yield 'overlapping tokens (longest match)' => [
+			'mapping' => [
+				'ABC' => $s1,
+				'AB' => $s2,
+			],
+			'content' => 'ABC',
+			'expectedSegments' => [$s1],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		$s2 = new InterpolationSegment([]);
+		yield 'overlapping tokens (shortest match starts later)' => [
+			'mapping' => [
+				'ABC' => $s1,
+				'BC' => $s2,
+			],
+			'content' => 'ABC',
+			'expectedSegments' => [$s1],
+		];
+
+		yield 'no match' => [
+			'mapping' => ['{T1}' => new InterpolationSegment([])],
+			'content' => 'hello world',
+			'expectedSegments' => [new StringSegment('hello world')],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		yield 'match at the end' => [
+			'mapping' => ['{T1}' => $s1],
+			'content' => 'hello {T1}',
+			'expectedSegments' => [
+				new StringSegment('hello '),
+				$s1,
+			],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		yield 'multiple occurrences of same token' => [
+			'mapping' => ['{T1}' => $s1],
+			'content' => '{T1} and {T1}',
+			'expectedSegments' => [
+				$s1,
+				new StringSegment(' and '),
+				$s1,
+			],
+		];
+
+		$s1 = new InterpolationSegment([]);
+		$s2 = new InterpolationSegment([]);
+		yield 'partial match of longer token' => [
+			'mapping' => [
+				'ABC' => $s1,
+				'AB' => $s2,
+			],
+			'content' => 'ABD',
+			'expectedSegments' => [
+				$s2,
+				new StringSegment('D'),
+			],
+		];
+	}
 }
