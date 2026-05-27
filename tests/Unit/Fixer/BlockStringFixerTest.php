@@ -46,11 +46,16 @@ final class BlockStringFixerTest extends TestCase
 		(new BlockStringFixer())->getConfigurationDefinition();
 	}
 
-	public function testConfigureWithInvalidConfiguration(): void
+	/**
+	 * @testWith ["not a serialized string"]
+	 *           [[{"some": "invalid", "config": "structure"}]]
+	 * @param mixed $formatters
+	 */
+	public function testConfigureWithInvalidConfiguration($formatters): void
 	{
 		$this->expectExceptionObject(new InvalidArgumentException('BlockStringFixer configuration is not valid.'));
 
-		(new BlockStringFixer())->configure(['formatters' => 'invalid']);
+		(new BlockStringFixer())->configure(['formatters' => $formatters]);
 	}
 
 	public function testConfig(): void

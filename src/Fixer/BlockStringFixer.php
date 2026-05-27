@@ -19,7 +19,7 @@ use const T_START_HEREDOC;
 /**
  * @phpstan-type TFormatters array<0|non-empty-string, AbstractFormatter>
  * @phpstan-type TDeserializedConfig array{formatters: TFormatters}
- * @phpstan-type TSerializedConfig array{formatters?: string}
+ * @phpstan-type TSerializedConfig array{formatters?: mixed}
  *
  * @implements ConfigurableFixerInterface<TSerializedConfig, TDeserializedConfig>
  */
@@ -79,8 +79,9 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 
 	public function configure(array $configuration): void
 	{
-		$formatters = $configuration['formatters'] ?? 'a:0:{}';
-		if (($formatters = @unserialize($formatters, ['allowed_classes' => true])) === false) {
+		if (!is_string($formatters = $configuration['formatters'] ?? 'a:0:{}')
+			|| ($formatters = @unserialize($formatters, ['allowed_classes' => true])) === false
+		) {
 			throw new InvalidArgumentException(
 				'BlockStringFixer configuration is not valid. '
 				. 'Did you set it up in your PHP CS Fixer config with `BlockStringFixer::config()`?'
