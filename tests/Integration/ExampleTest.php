@@ -38,7 +38,7 @@ final class ExampleTest extends TestCase
 				],
 				null,
 				[
-					'PHP_CS_FIXER_ALLOW_XDEBUG' => 1,
+					'PHP_CS_FIXER_ALLOW_XDEBUG' => '1',
 				]
 			);
 

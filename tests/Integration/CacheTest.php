@@ -65,7 +65,7 @@ final class CacheTest extends TestCase
 			],
 			self::$workspace,
 			[
-				'PHP_CS_FIXER_ALLOW_XDEBUG' => 1,
+				'PHP_CS_FIXER_ALLOW_XDEBUG' => '1',
 			]
 		);
 
