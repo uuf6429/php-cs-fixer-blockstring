@@ -33,11 +33,11 @@ use PhpCsFixer;
 use uuf6429\PhpCsFixerBlockstring\Fixer\BlockStringFixer;
 
 return (new PhpCsFixer\Config())
-    ->registerCustomFixers([new BlockStringFixer()])  // 👈 1️⃣
+    ->registerCustomFixers([new BlockStringFixer()])         // 👈 1️⃣
     ->setRules([
-        BlockStringFixer::NAME => [
-            'formatters' => [],                       // 👈 2️⃣
-        ]
+        BlockStringFixer::NAME => BlockStringFixer::config([
+                                                             // 👈 2️⃣
+        ]),
     ])
     ->setFinder(...);
 ```
