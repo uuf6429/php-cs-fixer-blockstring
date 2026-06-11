@@ -13,13 +13,14 @@ final class AbstractFormatterTest extends TestCase
 {
 	public function testThatAbstractFormatterIsCacheable(): void
 	{
-		$formatter = new class('fingerprint') extends AbstractFormatter {
+		$formatter = new class('the fingerprint') extends AbstractFormatter {
 			public function formatBlock(BlockString $blockString): BlockString
 			{
 				return $blockString;
 			}
 		};
 
-		$this->assertSame('fingerprint', $formatter->getCacheFingerprint());
+		$this->assertSame('the fingerprint', $formatter->getCacheFingerprint());
+		$this->assertSame(['cacheFingerprint' => 'the fingerprint'], $formatter->jsonSerialize());
 	}
 }
