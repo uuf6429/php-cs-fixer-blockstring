@@ -2,6 +2,7 @@
 
 namespace uuf6429\PhpCsFixerBlockstringTests\Unit\Fixer;
 
+use Exception;
 use InvalidArgumentException;
 use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
@@ -47,20 +48,48 @@ final class BlockStringFixerTest extends TestCase
 	}
 
 	/**
-	 * @testWith ["not a serialized string"]
-	 *           [[{"some": "invalid", "config": "structure"}]]
 	 * @param mixed $formatters
+	 * @dataProvider invalidConfigurationProvider
 	 */
-	public function testConfigureWithInvalidConfiguration($formatters): void
+	public function testConfigureWithInvalidConfiguration($formatters, Exception $expectedException): void
 	{
-		$this->expectExceptionObject(new InvalidArgumentException('BlockStringFixer configuration is not valid.'));
+		$this->expectExceptionObject($expectedException);
 
 		(new BlockStringFixer())->configure(['formatters' => $formatters]);
 	}
 
-	public function testConfig(): void
+	/**
+	 * @return iterable<string, array{formatters: mixed, expectedException: Exception}>
+	 */
+	public static function invalidConfigurationProvider(): iterable
 	{
-		$this->assertSame(['formatters' => 'a:0:{}'], BlockStringFixer::config([]));
+		yield 'invalid value for formatters' => [
+			'formatters' => 'invalid',
+			'expectedException' => new InvalidArgumentException(
+				'BlockStringFixer configuration is not valid: formatters must be an array, "string" given.'
+			),
+		];
+
+		yield 'invalid numeric key' => [
+			'formatters' => [1 => 'test'],
+			'expectedException' => new InvalidArgumentException(
+				'BlockStringFixer configuration is not valid: formatter for integer key 1 will never be used.'
+			),
+		];
+
+		yield 'invalid default formatter' => [
+			'formatters' => [0 => 'invalid'],
+			'expectedException' => new InvalidArgumentException(
+				'BlockStringFixer configuration is not valid: formatter for key 0 must be an instance of uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter, string was given instead.',
+			),
+		];
+
+		yield 'invalid JSON formatter' => [
+			'formatters' => ['JSON' => 'invalid'],
+			'expectedException' => new InvalidArgumentException(
+				'BlockStringFixer configuration is not valid: formatter for key JSON must be an instance of uuf6429\PhpCsFixerBlockstring\Formatter\AbstractFormatter, string was given instead.',
+			)
+		];
 	}
 
 	/**

@@ -2,6 +2,7 @@
 
 namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
+use JsonSerializable;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 use uuf6429\PhpCsFixerBlockstring\CacheFingerprintableInterface;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
@@ -17,7 +18,7 @@ use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
  * 2. Or if, for whatever reason, the {@see CodecInterface} concept does not work for you and you want to write
  *    something from scratch.
  */
-abstract class AbstractFormatter implements CacheFingerprintableInterface
+abstract class AbstractFormatter implements CacheFingerprintableInterface, JsonSerializable
 {
 	/**
 	 * @var mixed
@@ -51,5 +52,13 @@ abstract class AbstractFormatter implements CacheFingerprintableInterface
 	final public function getCacheFingerprint()
 	{
 		return $this->cacheFingerprint;
+	}
+
+	/**
+	 * @return array{cacheFingerprint: mixed, ...}
+	 */
+	public function jsonSerialize(): array
+	{
+		return ['cacheFingerprint' => $this->getCacheFingerprint()];
 	}
 }

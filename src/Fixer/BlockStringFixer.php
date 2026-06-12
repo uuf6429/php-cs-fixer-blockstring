@@ -32,7 +32,9 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 	/**
 	 * @var TDeserializedConfig
 	 */
-	private array $configuration;
+	private array $configuration = [
+		'formatters' => [],
+	];
 
 	public function isRisky(): bool
 	{
@@ -79,19 +81,31 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 
 	public function configure(array $configuration): void
 	{
-		if (!is_string($formatters = $configuration['formatters'] ?? 'a:0:{}')
-			|| ($formatters = @unserialize($formatters, ['allowed_classes' => true])) === false
-		) {
-			throw new InvalidArgumentException(
-				'BlockStringFixer configuration is not valid. '
-				. 'Did you set it up in your PHP CS Fixer config with `BlockStringFixer::config()`?'
-			);
+		$formatters = $configuration['formatters'] ?? [];
+		if (!is_array($formatters)) {
+			throw new InvalidArgumentException(sprintf(
+				'BlockStringFixer configuration is not valid: formatters must be an array, "%s" given.',
+				is_object($formatters) ? get_class($formatters) : gettype($formatters)
+			));
 		}
+		foreach ($formatters as $key => $formatter) {
+			if (is_int($key) && $key !== 0) {
+				throw new InvalidArgumentException(sprintf(
+					'BlockStringFixer configuration is not valid: formatter for integer key %s will never be used.',
+					$key
+				));
+			}
 
-		// @phpstan-ignore assign.propertyType
-		$this->configuration = [
-			'formatters' => $formatters,
-		];
+			if (!$formatter instanceof AbstractFormatter) {
+				throw new InvalidArgumentException(sprintf(
+					'BlockStringFixer configuration is not valid: formatter for key %s must be an instance of %s, %s was given instead.',
+					$key,
+					AbstractFormatter::class,
+					is_object($formatter) ? get_class($formatter) : gettype($formatter)
+				));
+			}
+		}
+		$this->configuration['formatters'] = $formatters;
 	}
 
 	public function fix(SplFileInfo $file, Tokens $tokens): void
@@ -117,7 +131,7 @@ final class BlockStringFixer implements FixerInterface, ConfigurableFixerInterfa
 	public static function config(array $formatters): array
 	{
 		return [
-			'formatters' => serialize($formatters),
+			'formatters' => $formatters,
 		];
 	}
 }
