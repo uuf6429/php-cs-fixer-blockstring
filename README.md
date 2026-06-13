@@ -366,9 +366,9 @@ return (new PhpCsFixer\Config())
                 // A codec for handling placeholers in template strings; depends on the content being formatted.
                 interpolationCodec: new PlainStringCodec(),
                 // A normalizer for handling end-of-line characters.
-                lineEndingNormalizer: null
+                lineEndingNormalizer: null,
                 // Factory for creating processes. Defaults to Symfony process factory.
-                processFactory = null,
+                processFactory: null,
             )
         ]),
     ]);
@@ -406,7 +406,7 @@ return (new PhpCsFixer\Config())
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null,
                 // Factory for creating processes. Defaults to Symfony process factory.
-                processFactory = null,
+                processFactory: null,
             )
         ]),
     ]);

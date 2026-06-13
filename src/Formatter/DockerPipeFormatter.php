@@ -36,7 +36,7 @@ use uuf6429\PhpCsFixerBlockstring\Process\SymfonyProcessFactory;
  *                 // A normalizer for handling end-of-line characters.
  *                 lineEndingNormalizer: null,
  *                 // Factory for creating processes. Defaults to Symfony process factory.
- *                 processFactory = null,
+ *                 processFactory: null,
  *             )
  *         ]),
  *     ]);

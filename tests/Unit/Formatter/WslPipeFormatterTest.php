@@ -31,6 +31,10 @@ final class WslPipeFormatterTest extends TestCase
 				[
 					['wsl --shell-type login -- "php" "-r" "echo strrev(stream_get_contents(STDIN));"', null, null, 'foobar'],
 					$this->createProcessMock('raboof'),
+				],
+				[
+					['wsl --shell-type login -- \'php\' \'-r\' \'echo strrev(stream_get_contents(STDIN));\'', null, null, 'foobar'],
+					$this->createProcessMock('raboof'),
 				]
 			])
 		);
