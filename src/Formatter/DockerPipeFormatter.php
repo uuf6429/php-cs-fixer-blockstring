@@ -4,11 +4,12 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
+use uuf6429\PhpCsFixerBlockstring\Process\ProcessFactoryInterface;
+use uuf6429\PhpCsFixerBlockstring\Process\ProcessFailedException;
+use uuf6429\PhpCsFixerBlockstring\Process\SymfonyProcessFactory;
 
 /**
  * The minimal setup, stable repeatability, and a rich ecosystem make Docker images an ideal source of formatting
@@ -34,6 +35,8 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *                 interpolationCodec: new PlainStringCodec(),
  *                 // A normalizer for handling end-of-line characters.
  *                 lineEndingNormalizer: null,
+ *                 // Factory for creating processes. Defaults to Symfony process factory.
+ *                 processFactory = null,
  *             )
  *         ]),
  *     ]);
@@ -73,37 +76,30 @@ class DockerPipeFormatter extends AbstractStringFormatter
 	private array $imageDetails;
 
 	/**
+	 * @readonly
+	 */
+	private ProcessFactoryInterface $processFactory;
+
+	/**
 	 * @param list<string> $options
 	 * @param list<string> $command
 	 * @param 'never'|'missing'|'always' $pullMode
-	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
-		string          $image,
-		array           $options = [],
-		array           $command = [],
-		string          $pullMode = 'never',
-		?CodecInterface $interpolationCodec = null,
-		                $lineEndingNormalizer = true
+		string                   $image,
+		array                    $options = [],
+		array                    $command = [],
+		string                   $pullMode = 'never',
+		?CodecInterface          $interpolationCodec = null,
+		?NormalizerInterface     $lineEndingNormalizer = null,
+		?ProcessFactoryInterface $processFactory = null
 	) {
 		$this->image = $image;
 		$this->options = $options;
 		$this->command = $command;
 		$this->pullMode = $pullMode;
+		$this->processFactory = $processFactory ?? new SymfonyProcessFactory();
 		$this->imageDetails = $this->resolveImageDetails();
-
-		if (is_bool($lineEndingNormalizer)) {
-			trigger_deprecation(
-				'uuf6429/php-cs-fixer-blockstring',
-				'1.0.4',
-				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
-				__METHOD__
-			);
-			$lineEndingNormalizer = new DefaultNormalizer(
-				DefaultNormalizer::LF,
-				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
-			);
-		}
 
 		parent::__construct(
 			sprintf(
@@ -119,7 +115,7 @@ class DockerPipeFormatter extends AbstractStringFormatter
 				)
 			),
 			$interpolationCodec,
-			$lineEndingNormalizer
+			$lineEndingNormalizer ?? new DefaultNormalizer(DefaultNormalizer::LF, DefaultNormalizer::STRIP)
 		);
 	}
 
@@ -139,7 +135,7 @@ class DockerPipeFormatter extends AbstractStringFormatter
 				}
 				$this->pullImage();
 				return $this->inspectImage(true);
-			// @codeCoverageIgnoreEnd
+				// @codeCoverageIgnoreEnd
 
 			case 'always':
 				$this->pullImage();
@@ -155,17 +151,12 @@ class DockerPipeFormatter extends AbstractStringFormatter
 	 */
 	private function inspectImage(bool $throwOnFailure): ?array
 	{
-		$process = new Process(
-			['docker', 'image', 'inspect', $this->image, '--format={{.Os}}/{{.Architecture}} {{.Id}}'],
-			null,
-			null,
-			null,
-			null
+		$process = $this->processFactory->create(
+			['docker', 'image', 'inspect', $this->image, '--format={{.Os}}/{{.Architecture}} {{.Id}}']
 		);
 		try {
 			$result = $process->mustRun()->getOutput();
 			$result = explode(' ', trim($result), 2);
-
 			return ['platform' => $result[0], 'digest' => $result[1]];
 		} catch (ProcessFailedException $ex) {
 			if (!$throwOnFailure) {
@@ -179,33 +170,28 @@ class DockerPipeFormatter extends AbstractStringFormatter
 
 	private function pullImage(): void
 	{
-		(new Process(
-			['docker', 'image', 'pull', $this->image],
-			null,
-			null,
-			null,
-			null
-		))->mustRun();
+		$this->processFactory
+			->create(['docker', 'image', 'pull', $this->image])
+			->mustRun();
 	}
 
 	protected function formatContent(string $original): string
 	{
-		$process = new Process(
-			[
-				'docker',
-				'run',
-				'--rm',
-				'--interactive',
-				...$this->options,
-				$this->imageDetails['digest'],
-				...$this->command,
-			],
-			null,
-			null,
-			$original,
-			null
-		);
-
-		return $process->mustRun()->getOutput();
+		return $this->processFactory
+			->create(
+				[
+					'docker',
+					'run',
+					'--rm',
+					'--interactive',
+					...$this->options,
+					$this->imageDetails['digest'],
+					...$this->command,
+				],
+				null,
+				null,
+				$original
+			)->mustRun()
+			->getOutput();
 	}
 }

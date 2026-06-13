@@ -6,24 +6,33 @@ use PHPUnit\Framework\TestCase;
 use uuf6429\PhpCsFixerBlockstring\BlockString\BlockString;
 use uuf6429\PhpCsFixerBlockstring\BlockString\StringSegment;
 use uuf6429\PhpCsFixerBlockstring\Formatter\WslPipeFormatter;
+use uuf6429\PhpCsFixerBlockstringTests\MockProcessFactoryTrait;
 
 /**
  * @internal
  */
 final class WslPipeFormatterTest extends TestCase
 {
+	use MockProcessFactoryTrait;
+
 	public function testFormat(): void
 	{
-		if (PHP_OS_FAMILY !== 'Windows') {
-			$this->markTestSkipped('WSL is only available on Windows');
-		}
-		if (getenv('GITHUB_ACTIONS') === 'true') {
-			$this->markTestSkipped('WSL on GitHub Actions is poorly supported and unusable');
-		}
-
 		$formatter = new WslPipeFormatter(
 			['cmd' => 'php -v'],
-			['cmd' => ['php', '-r', 'echo strrev(stream_get_contents(STDIN));']]
+			['cmd' => ['php', '-r', 'echo strrev(stream_get_contents(STDIN));']],
+			null,
+			'login',
+			null,
+			$this->createProcessFactoryMock([
+				[
+					['wsl --shell-type login -- php -v', null, null, null],
+					$this->createProcessMock('v1.0'),
+				],
+				[
+					['wsl --shell-type login -- "php" "-r" "echo strrev(stream_get_contents(STDIN));"', null, null, 'foobar'],
+					$this->createProcessMock('raboof'),
+				]
+			])
 		);
 		$inputBlockString = new BlockString('', '', [new StringSegment('foobar')]);
 

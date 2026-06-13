@@ -367,6 +367,8 @@ return (new PhpCsFixer\Config())
                 interpolationCodec: new PlainStringCodec(),
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null
+                // Factory for creating processes. Defaults to Symfony process factory.
+                processFactory = null,
             )
         ]),
     ]);
@@ -403,6 +405,8 @@ return (new PhpCsFixer\Config())
                 interpolationCodec: new PlainStringCodec(),
                 // A normalizer for handling end-of-line characters.
                 lineEndingNormalizer: null,
+                // Factory for creating processes. Defaults to Symfony process factory.
+                processFactory = null,
             )
         ]),
     ]);

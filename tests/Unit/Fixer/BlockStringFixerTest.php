@@ -47,6 +47,11 @@ final class BlockStringFixerTest extends TestCase
 		(new BlockStringFixer())->getConfigurationDefinition();
 	}
 
+	public function testConfigDsl(): void
+	{
+		$this->assertSame(['formatters' => []], BlockStringFixer::config([]));
+	}
+
 	/**
 	 * @param mixed $formatters
 	 * @dataProvider invalidConfigurationProvider
