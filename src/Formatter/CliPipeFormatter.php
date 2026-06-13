@@ -2,10 +2,11 @@
 
 namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 
-use Symfony\Component\Process\Process;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
+use uuf6429\PhpCsFixerBlockstring\Process\ProcessFactoryInterface;
+use uuf6429\PhpCsFixerBlockstring\Process\SymfonyProcessFactory;
 
 /**
  * It's no secret that the best formatting tools are not directly available in PHP. This formatter off-loads formatting
@@ -26,7 +27,9 @@ use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
  *                 // A codec for handling placeholers in template strings; depends on the content being formatted.
  *                 interpolationCodec: new PlainStringCodec(),
  *                 // A normalizer for handling end-of-line characters.
- *                 lineEndingNormalizer: null
+ *                 lineEndingNormalizer: null,
+ *                 // Factory for creating processes. Defaults to Symfony process factory.
+ *                 processFactory: null,
  *             )
  *         ]),
  *     ]);
@@ -50,31 +53,24 @@ class CliPipeFormatter extends AbstractStringFormatter
 	private array $formatter;
 
 	/**
+	 * @readonly
+	 */
+	private ProcessFactoryInterface $processFactory;
+
+	/**
 	 * @param TVersion|TCommand $versionValueOrCommand Either the version (as a string) or a command to retrieve the
 	 * version (as an array).
 	 * @param TCommand $formatCommand A command, as an array, to perform the formatting.
-	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
 		$versionValueOrCommand,
 		array $formatCommand,
 		?CodecInterface $interpolationCodec = null,
-		$lineEndingNormalizer = false
+		?NormalizerInterface $lineEndingNormalizer = null,
+		?ProcessFactoryInterface $processFactory = null
 	) {
 		$this->formatter = $formatCommand;
-
-		if (is_bool($lineEndingNormalizer)) {
-			trigger_deprecation(
-				'uuf6429/php-cs-fixer-blockstring',
-				'1.0.4',
-				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
-				__METHOD__
-			);
-			$lineEndingNormalizer = new DefaultNormalizer(
-				DefaultNormalizer::LF,
-				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
-			);
-		}
+		$this->processFactory = $processFactory ?? new SymfonyProcessFactory();
 
 		parent::__construct(
 			sprintf(
@@ -88,7 +84,7 @@ class CliPipeFormatter extends AbstractStringFormatter
 					: $this->exec($versionValueOrCommand, null)
 			),
 			$interpolationCodec,
-			$lineEndingNormalizer
+			$lineEndingNormalizer ?? new DefaultNormalizer(DefaultNormalizer::LF, DefaultNormalizer::NO_CHANGE)
 		);
 	}
 
@@ -97,23 +93,15 @@ class CliPipeFormatter extends AbstractStringFormatter
 	 */
 	protected function exec(array $spec, ?string $input): string
 	{
-		$process = is_array($spec['cmd'])
-			? new Process(
+		return $this->processFactory
+			->create(
 				$spec['cmd'],
 				$spec['cwd'] ?? null,
 				$spec['env'] ?? null,
-				$input,
-				null
+				$input
 			)
-			: Process::fromShellCommandline(
-				$spec['cmd'],
-				$spec['cwd'] ?? null,
-				$spec['env'] ?? null,
-				$input,
-				null
-			);
-
-		return $process->mustRun()->getOutput();
+			->mustRun()
+			->getOutput();
 	}
 
 	protected function formatContent(string $original): string

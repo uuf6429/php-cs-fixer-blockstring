@@ -5,6 +5,7 @@ namespace uuf6429\PhpCsFixerBlockstring\Formatter;
 use uuf6429\PhpCsFixerBlockstring\InterpolationCodec\CodecInterface;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\DefaultNormalizer;
 use uuf6429\PhpCsFixerBlockstring\LineEndingNormalizer\NormalizerInterface;
+use uuf6429\PhpCsFixerBlockstring\Process\ProcessFactoryInterface;
 
 /**
  * A formatter making use of Windows Subsystem for Linux (WSL). Of course, you will need to be running on Windows,
@@ -20,31 +21,24 @@ class WslPipeFormatter extends CliPipeFormatter
 
 	/**
 	 * @param 'standard'|'login'|'none' $shellType
-	 * @param null|bool|NormalizerInterface $lineEndingNormalizer
 	 */
 	public function __construct(
 		$versionValueOrCommand,
 		array $formatCommand,
 		?CodecInterface $interpolationCodec = null,
 		string $shellType = 'login',
-		$lineEndingNormalizer = true
+		?NormalizerInterface $lineEndingNormalizer = null,
+		?ProcessFactoryInterface $processFactory = null
 	) {
 		$this->shellType = $shellType;
 
-		if (is_bool($lineEndingNormalizer)) {
-			trigger_deprecation(
-				'uuf6429/php-cs-fixer-blockstring',
-				'1.0.4',
-				'Passing a bool for argument $lineEndingNormalizer to %s is deprecated',
-				__METHOD__
-			);
-			$lineEndingNormalizer = new DefaultNormalizer(
-				DefaultNormalizer::LF,
-				$lineEndingNormalizer ? DefaultNormalizer::STRIP : DefaultNormalizer::NO_CHANGE
-			);
-		}
-
-		parent::__construct($versionValueOrCommand, $formatCommand, $interpolationCodec, $lineEndingNormalizer);
+		parent::__construct(
+			$versionValueOrCommand,
+			$formatCommand,
+			$interpolationCodec,
+			$lineEndingNormalizer ?? new DefaultNormalizer(DefaultNormalizer::LF, DefaultNormalizer::STRIP),
+			$processFactory
+		);
 	}
 
 	protected function exec(array $spec, ?string $input): string
