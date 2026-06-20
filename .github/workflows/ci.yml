@@ -17,7 +17,7 @@ jobs:
         name: Check GH Actions
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
             -   uses: reviewdog/action-actionlint@v1
                 with:
                     fail_level: 'any'
@@ -27,7 +27,7 @@ jobs:
         name: Check composer.json
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
             -   uses: shivammathur/setup-php@v2
                 with:
                     coverage: none
@@ -38,7 +38,7 @@ jobs:
         name: Check code
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
             -   uses: shivammathur/setup-php@v2
                 with:
                     coverage: none
@@ -76,7 +76,7 @@ jobs:
                         php: '8.4'
                         bootstrap: true
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
             -   uses: shivammathur/setup-php@v2
                 with:
                     php-version: "${{ matrix.php }}"
