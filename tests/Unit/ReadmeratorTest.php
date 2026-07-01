@@ -16,7 +16,6 @@ final class ReadmeratorTest extends TestCase
 		Readmerator::render();
 		$actual = ob_get_clean();
 
-		$this->assertNotFalse($actual);
 		$this->assertStringEqualsFile(__DIR__ . '/../../README.md', $actual);
 	}
 }
