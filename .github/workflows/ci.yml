@@ -89,7 +89,7 @@ jobs:
                 with:
                     path: ${{ steps.composer-cache.outputs.dir }}
                     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-            -   if: matrix.os == 'macos-15-intel'
+            -   if: matrix.os == 'macos-15'
                 uses: douglascamata/setup-docker-macos-action@v1.1.0
             -   if: ${{ matrix.bootstrap }}
                 # language=bash
